@@ -28,12 +28,24 @@ A Jellyfin plugin that turns each user's listening and watching history into a y
 
 ## Installation
 
-1. Download or [build](#building) the plugin. You need the following files:
-   - `Jellyfin.Plugin.JellyWrapped.dll`
-   - `meta.json`
-   - `jellywrapped.png`
+### From the plugin repository (recommended)
+
+1. In Jellyfin, go to Dashboard → Plugins → Repositories and add:
+
+   ```
+   https://raw.githubusercontent.com/Catsuri33/jellywrapped/main/manifest.json
+   ```
+
+2. Install **JellyWrapped** from the catalog.
+3. Restart Jellyfin.
+
+Updates then show up in the catalog like any other plugin.
+
+### Manually
+
+1. Download the zip of a [release](https://github.com/Catsuri33/jellywrapped/releases), or [build](#building) the plugin.
 2. Stop Jellyfin.
-3. Copy the files into `<jellyfin-data>/plugins/JellyWrapped/`. With the official Docker image, that is `/config/plugins/JellyWrapped/`.
+3. Extract `Jellyfin.Plugin.JellyWrapped.dll`, `meta.json` and `jellywrapped.png` into `<jellyfin-data>/plugins/JellyWrapped/`. With the official Docker image, that is `/config/plugins/JellyWrapped/`.
 4. Make sure the files belong to the user Jellyfin runs as.
 5. Start Jellyfin.
 
@@ -95,6 +107,23 @@ The files to install end up in `Jellyfin.Plugin.JellyWrapped/bin/Release/net10.0
 
 > [!TIP]
 > `/JellyWrapped/App/#s=3` opens the recap directly on the fourth slide, which is handy when working on the interface.
+
+### Releasing
+
+Push a version tag:
+
+```sh
+git tag v1.1.0.0
+git push origin v1.1.0.0
+```
+
+The `Release Plugin` workflow then:
+
+1. builds the plugin with that version;
+2. publishes `jellywrapped_<version>.zip` as a GitHub release, with the commits since the previous tag as changelog;
+3. adds the version to `manifest.json` on `main`, which is the plugin repository Jellyfin reads.
+
+The Jellyfin version the release targets comes from `targetAbi` in `Jellyfin.Plugin.JellyWrapped/meta.json`.
 
 ### Adding a language
 

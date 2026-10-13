@@ -1,0 +1,103 @@
+name: 'Release Plugin'
+
+# Push a tag such as v1.1.0.0 (or v1.1.0) to build the plugin, publish it as a GitHub release
+# and add it to manifest.json, the plugin repository that Jellyfin reads.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  PROJECT: Jellyfin.Plugin.JellyWrapped
+  MANIFEST: manifest.json
+  IMAGE_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/Jellyfin.Plugin.JellyWrapped/jellywrapped.png
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Jellyfin versions have four parts.
+          while [ "$(tr -cd '.' <<< "$VERSION" | wc -c)" -lt 3 ]; do VERSION="$VERSION.0"; done
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME is not a version (expected v1.2.3 or v1.2.3.4)"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "zip=jellywrapped_$VERSION.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: >-
+          dotnet build "$PROJECT.slnx" -c Release
+          -p:Version=${{ steps.version.outputs.version }}
+          -p:AssemblyVersion=${{ steps.version.outputs.version }}
+          -p:FileVersion=${{ steps.version.outputs.version }}
+
+      - name: Write changelog
+        run: |
+          PREVIOUS=$(git describe --tags --abbrev=0 "$GITHUB_REF_NAME^" 2>/dev/null || true)
+          git log --no-merges --pretty='- %s' ${PREVIOUS:+"$PREVIOUS.."}"$GITHUB_REF_NAME" > changelog.md
+          cat changelog.md
+
+      - name: Package
+        id: package
+        run: |
+          OUT="$PROJECT/bin/Release/net10.0"
+          mkdir package
+          cp "$OUT/$PROJECT.dll" "$OUT/jellywrapped.png" package/
+          jq --arg version "${{ steps.version.outputs.version }}" \
+             --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             --rawfile changelog changelog.md \
+             '.version = $version | .timestamp = $timestamp | .changelog = $changelog' \
+             "$OUT/meta.json" > package/meta.json
+          (cd package && zip -9 "../${{ steps.version.outputs.zip }}" ./*)
+          echo "checksum=$(md5sum "${{ steps.version.outputs.zip }}" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" "${{ steps.version.outputs.zip }}"
+          --title "JellyWrapped ${{ steps.version.outputs.version }}"
+          --notes-file changelog.md
+
+      - name: Add the version to the plugin repository
+        run: |
+          META="package/meta.json"
+          URL="https://github.com/${{ github.repository }}/releases/download/$GITHUB_REF_NAME/${{ steps.version.outputs.zip }}"
+
+          git fetch origin main
+          git checkout main
+          [ -f "$MANIFEST" ] || echo '[]' > "$MANIFEST"
+
+          jq --slurpfile meta "$META" \
+             --arg url "$URL" \
+             --arg checksum "${{ steps.package.outputs.checksum }}" \
+             --arg image "$IMAGE_URL" \
+             -f .github/scripts/add-release.jq "$MANIFEST" > "$MANIFEST.tmp"
+          mv "$MANIFEST.tmp" "$MANIFEST"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$MANIFEST"
+          git commit -m "chore: publish ${{ steps.version.outputs.version }} in the plugin manifest"
+          git push origin main
