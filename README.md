@@ -23,10 +23,8 @@ A Jellyfin plugin that turns each user's listening and watching history into a y
 - 🕰️ **Past history.**
   - Import from the [Playback Reporting](https://github.com/jellyfin/jellyfin-plugin-playbackreporting) plugin.
   - Estimates based on movies and episodes marked as played.
-- ✨ **Built into Jellyfin.** A "Mon Wrapped" menu entry and a seasonal home-page banner, when [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) is installed.
-
-> [!NOTE]
-> The recap and the settings pages are currently in French.
+- ✨ **Built into Jellyfin.** A "My Wrapped" menu entry and a seasonal home-page banner, when [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) is installed.
+- 🌍 **English and French.** JellyWrapped follows each user's Jellyfin display language, then the browser's, and falls back to English.
 
 ## Installation
 
@@ -47,17 +45,17 @@ A Jellyfin plugin that turns each user's listening and watching history into a y
 | Who | Where |
 | --- | --- |
 | Users | `https://<your-server>/JellyWrapped/`. The page reuses the Jellyfin session from the browser. |
-| Admins | Dashboard → Plugins → **Wrapped des utilisateurs** |
+| Admins | Dashboard → Plugins → **Users' Wrapped** |
 | Settings | Dashboard → Plugins → JellyWrapped |
 
 ### Adding a menu entry
 
-The easiest way is to install **File Transformation**. JellyWrapped then adds a "Mon Wrapped" entry to the side menu and shows a home-page banner during a configurable period (1 December to 31 January by default).
+The easiest way is to install **File Transformation**. JellyWrapped then adds a "My Wrapped" entry to the side menu and shows a home-page banner during a configurable period (1 December to 31 January by default).
 
 Without it, you can add the link through jellyfin-web's `config.json`:
 
 ```json
-"menuLinks": [{ "name": "Mon Wrapped", "icon": "auto_awesome", "url": "/JellyWrapped/" }]
+"menuLinks": [{ "name": "My Wrapped", "icon": "auto_awesome", "url": "/JellyWrapped/" }]
 ```
 
 > [!NOTE]
@@ -98,6 +96,15 @@ The files to install end up in `Jellyfin.Plugin.JellyWrapped/bin/Release/net10.0
 > [!TIP]
 > `/JellyWrapped/App/#s=3` opens the recap directly on the fourth slide, which is handy when working on the interface.
 
+### Adding a language
+
+All the texts live in `Jellyfin.Plugin.JellyWrapped/Web/lang-<code>.json`, where `<code>` is a two-letter language code.
+
+1. Copy `lang-en.json` to `lang-<code>.json`.
+2. Set `_locale` to the matching locale (for example `de-DE`). It is used to format dates and numbers.
+3. Translate the values. Entries written as `{ "one": …, "other": … }` are plural forms; `{n}`, `{name}` and the other placeholders are filled in by the code.
+4. Build: every `lang-*.json` file is embedded automatically.
+
 <details>
 <summary><b>Project layout</b></summary>
 
@@ -108,7 +115,7 @@ The files to install end up in `Jellyfin.Plugin.JellyWrapped/bin/Release/net10.0
 | `Stats/` | Builds the yearly recap |
 | `Sharing/` | Public share links |
 | `Api/` | REST API and web app hosting |
-| `Web/` | Story web app and the script injected into Jellyfin |
+| `Web/` | Story web app, translations and the script injected into Jellyfin |
 | `Configuration/` | Settings and admin dashboard pages |
 
 </details>

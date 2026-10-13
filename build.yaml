@@ -4,14 +4,14 @@ guid: "8f868969-3282-4493-878a-3e89e2f79d3a"
 version: "1.0.0.0"
 targetAbi: "12.2.0.0"
 framework: "net10.0"
-overview: "Un récapitulatif annuel façon « Wrapped » de vos musiques, films et séries"
+overview: "A yearly Wrapped-style recap of your music, movies and series"
 description: >
-  JellyWrapped enregistre les lectures de chaque utilisateur et génère, pour chaque année,
-  un récapitulatif en « stories » : temps passé, artistes, titres, albums, films, séries,
-  habitudes d'écoute et profil. Chaque utilisateur peut le partager en image ou via un lien public.
+  JellyWrapped records each user's plays and builds a yearly recap, played as stories:
+  time spent, artists, tracks, albums, movies, series, listening habits and persona.
+  Users can share it as an image or through a public link. Available in English and French.
 category: "General"
 owner: "Louis Michault"
 artifacts:
 - "Jellyfin.Plugin.JellyWrapped.dll"
 changelog: >
-  Première version.
+  First release.

@@ -1,0 +1,229 @@
+{
+  "_locale": "fr-FR",
+  "units": {
+    "minute": { "one": "{n} minute", "other": "{n} minutes" },
+    "hour": { "one": "{n} heure", "other": "{n} heures" },
+    "day": { "one": "{n} jour", "other": "{n} jours" },
+    "play": { "one": "{n} écoute", "other": "{n} écoutes" },
+    "distinctTitle": { "one": "{n} titre différent", "other": "{n} titres différents" },
+    "movie": { "one": "{n} film", "other": "{n} films" },
+    "episode": { "one": "{n} épisode", "other": "{n} épisodes" },
+    "episodeShort": { "one": "{n} ép.", "other": "{n} ép." },
+    "series": { "one": "{n} série", "other": "{n} séries" },
+    "minutesShort": "{n} min"
+  },
+  "app": {
+    "loading": "Chargement",
+    "close": "Fermer",
+    "login": {
+      "text": "Connecte-toi à Jellyfin dans ce navigateur pour découvrir ton année en musique, films et séries.",
+      "button": "Se connecter à Jellyfin"
+    },
+    "error": {
+      "title": "Oups",
+      "retry": "Réessayer",
+      "loadOwn": "Impossible de charger ton récapitulatif.",
+      "loadOther": "Impossible de charger ce récapitulatif.",
+      "unreachable": "Impossible de joindre le serveur.",
+      "shareMissing": "Ce lien de partage n'existe pas ou n'est plus actif.",
+      "adminOnly": "Seuls les administrateurs peuvent voir le récapitulatif des autres utilisateurs."
+    },
+    "empty": {
+      "title": "Rien à déballer… pour l'instant",
+      "text": "Aucune lecture trouvée pour {year}. JellyWrapped enregistre tes écoutes et visionnages depuis le {since} : lance un film, une série ou un album, et reviens plus tard !",
+      "adminTitle": "Rien à afficher",
+      "adminText": "{name} n'a aucune lecture en {year}."
+    },
+    "backToJellyfin": "Retour à Jellyfin",
+    "backToDashboard": "Retour au tableau de bord",
+    "intro": {
+      "hello": "Salut {name}&nbsp;👋",
+      "text": "Voici ton année {year} sur Jellyfin : la musique, les films et les séries qui l'ont marquée.",
+      "hint": "Touche la droite de l'écran pour avancer."
+    },
+    "total": {
+      "kicker": "Au total",
+      "lead": "Cette année, tu as passé",
+      "unit": "minutes sur Jellyfin",
+      "days": "Soit <b>{days} jours</b> non-stop, répartis sur <b>{activeDays}</b> d'activité et <b>{items}</b>.",
+      "noDays": "Réparties sur <b>{activeDays}</b> d'activité et <b>{items}</b>.",
+      "estimates": "Une partie des films et épisodes, vus avant l'installation de JellyWrapped, est estimée."
+    },
+    "split": {
+      "kicker": "Ton mix",
+      "title": "Comment s'est réparti ton temps",
+      "music": "🎧 Musique",
+      "movies": "🎬 Films",
+      "series": "📺 Séries",
+      "percent": "{n}&nbsp;%"
+    },
+    "music": {
+      "kicker": "Côté musique",
+      "unit": "minutes d'écoute",
+      "plays": "écoutes",
+      "distinctTracks": "titres différents",
+      "artists": "artistes",
+      "perPlay": "min. par écoute",
+      "firstTrack": "Ton tout premier morceau de l'année : <b>{name}</b>, le {date}."
+    },
+    "artist": {
+      "kicker": "Ton artiste n°1",
+      "together": "<b>{minutes}</b> ensemble, sur {plays}."
+    },
+    "tracks": {
+      "kicker": "Tes titres préférés",
+      "title": "Tu les as écoutés en boucle"
+    },
+    "albums": {
+      "kicker": "Albums & genres",
+      "genres": "Tes genres du moment :"
+    },
+    "movies": {
+      "kicker": "Côté cinéma",
+      "title": "<span class=\"hl\">{movies}</span> et {hours} devant l'écran",
+      "decade": "Ta décennie préférée : <b>{decade}</b>.",
+      "decadeLabel": "les années {decade}",
+      "longest": "Ton plus long film : <b>{name}</b>, {minutes}. Bravo pour l'endurance."
+    },
+    "actor": {
+      "kicker": "Ta tête d'affiche",
+      "text": "À l'affiche de <b>{n} de tes films</b> cette année."
+    },
+    "series": {
+      "kicker": "Côté séries",
+      "title": "<span class=\"hl\">{episodes}</span> de {series}"
+    },
+    "binge": {
+      "kicker": "Record de binge",
+      "title": "{n} épisodes en une journée",
+      "text": "Le {date}, <b>{name}</b> ne t'a pas lâché."
+    },
+    "habits": {
+      "kicker": "Tes habitudes",
+      "peakMonth": "<span class=\"hl\">{month}</span> a été ton mois le plus intense",
+      "byMonth": "Ton année, mois par mois",
+      "peakHour": "Ton heure de pointe : <b>{hour}</b>.",
+      "streak": "ta plus longue série d'affilée",
+      "peakDay": "le {date}, ton jour record",
+      "peakDayNoDate": "ton jour record"
+    },
+    "server": {
+      "kicker": "Sur ce serveur",
+      "leadFirst": "Parmi les {n} utilisateurs actifs, tu es le",
+      "leadTop": "Parmi les {n} utilisateurs actifs, tu fais partie du",
+      "first": "n°1",
+      "top": "top {n}&nbsp;%",
+      "firstText": "Personne n'a passé plus de temps sur Jellyfin que toi cette année.",
+      "rankText": "Tu es {rank}<sup>e</sup> au classement du temps passé."
+    },
+    "persona": {
+      "kicker": "Ton profil {year}"
+    },
+    "summary": {
+      "kicker": "Ton année en résumé",
+      "sharedKicker": "L'année de {name}",
+      "minutes": "Minutes",
+      "persona": "Profil",
+      "topArtists": "Top artistes",
+      "topTracks": "Top titres",
+      "topMovies": "Top films",
+      "topSeries": "Top séries",
+      "discover": "Découvrir Jellyfin",
+      "saveImage": "Enregistrer l'image",
+      "createLink": "Créer un lien public",
+      "publicLink": "Lien public"
+    },
+    "share": {
+      "linkLabel": "Lien public",
+      "copy": "Copier",
+      "revoke": "Supprimer",
+      "note": "Toute personne qui a ce lien voit ce résumé, figé à aujourd'hui, si ton serveur est accessible depuis Internet.",
+      "copied": "Lien copié",
+      "revoked": "Lien supprimé",
+      "linkError": "Impossible de créer le lien",
+      "imageSaved": "Image enregistrée",
+      "imageError": "Impossible de générer l'image",
+      "title": "Mon JellyWrapped {year}"
+    }
+  },
+  "personas": {
+    "binge-watcher": ["Binge-watcher", "Un épisode ? Non : toute la saison. Le bouton « épisode suivant » n'a aucun secret pour toi."],
+    "night-owl": ["Oiseau de nuit", "Plus d'un tiers de ton temps entre 22 h et 5 h. Le calme de la nuit, c'est ton moment."],
+    "early-bird": ["Lève-tôt", "Tu lances tes lectures avant même le premier café. Respect."],
+    "explorer": ["Explorateur musical", "Plus de 100 artistes différents : tes oreilles ne tiennent pas en place."],
+    "music-lover": ["Mélomane", "La musique d'abord, le reste ensuite. Ton casque mérite des vacances."],
+    "cinephile": ["Cinéphile", "Les films, c'est ton terrain de jeu. Lumières éteintes, son à fond."],
+    "series-addict": ["Sériephile", "Les séries ont occupé l'essentiel de ton année. Tu connais les génériques par cœur."],
+    "weekend-warrior": ["Pro du week-end", "Samedi et dimanche, c'est sacré : canapé et Jellyfin."],
+    "eclectic": ["Éclectique", "Un peu de tout, beaucoup de bon : tu ne te laisses enfermer dans aucune case."]
+  },
+  "inject": {
+    "menu": "Mon Wrapped",
+    "bannerTitle": "Ton JellyWrapped {year} est prêt&nbsp;!",
+    "bannerText": "Tes artistes, films et séries de l'année en un coup d'œil.",
+    "bannerButton": "Découvrir",
+    "bannerHide": "Masquer"
+  },
+  "settings": {
+    "intro": "Le récapitulatif annuel de chaque utilisateur est disponible à l'adresse",
+    "usersLink": "Voir le Wrapped de chaque utilisateur",
+    "injected": "Le lien « Mon Wrapped » est ajouté au menu de Jellyfin pour tous les utilisateurs.",
+    "notInjected": "Le plugin File Transformation n'est pas détecté : partagez l'adresse ci-dessus avec vos utilisateurs, ou ajoutez-la dans les « menuLinks » du fichier config.json de jellyfin-web.",
+    "tracking": "Collecte",
+    "minAudio": "Durée minimale d'une écoute musicale (secondes)",
+    "minAudioHelp": "En dessous, le morceau est considéré comme passé et n'est pas compté.",
+    "minVideo": "Durée minimale d'un visionnage (secondes)",
+    "estimates": "Estimer l'historique antérieur",
+    "estimatesHelp": "Les films et épisodes marqués comme vus dans l'année, mais lus avant l'installation du plugin, sont comptés une fois, pour leur durée complète.",
+    "recap": "Récapitulatif",
+    "comparison": "Comparer avec les autres utilisateurs",
+    "comparisonHelp": "Affiche un classement (« top 10 % du serveur ») quand au moins 3 utilisateurs sont actifs. Aucun nom n'est montré.",
+    "sharing": "Autoriser les liens de partage publics",
+    "sharingHelp": "Chaque utilisateur peut créer un lien, visible sans compte, vers une copie figée de son récapitulatif. Désactiver cette option rend tous les liens inactifs.",
+    "webLink": "Ajouter « Mon Wrapped » au menu de Jellyfin",
+    "webLinkHelp": "Nécessite le plugin File Transformation. Prise en compte au prochain redémarrage.",
+    "banner": "Bannière d'accueil",
+    "showBanner": "Annoncer le récapitulatif sur la page d'accueil",
+    "showBannerHelp": "Une bannière « Ton JellyWrapped est prêt » s'affiche pendant la période ci-dessous ; chaque utilisateur peut la masquer. Nécessite le plugin File Transformation.",
+    "fromDay": "Du (jour)",
+    "toDay": "Au (jour)",
+    "month": "Mois",
+    "bannerWraps": "La période chevauche le Nouvel An : après le 1er janvier, la bannière annonce le récapitulatif de l'année écoulée.",
+    "bannerSameYear": "La bannière annonce le récapitulatif de l'année en cours.",
+    "save": "Enregistrer",
+    "history": "Historique",
+    "loading": "Chargement…",
+    "trackingSince": "Enregistrement depuis le {date}.",
+    "playsInYear": "{year} : {plays} lectures",
+    "noPlays": "Aucune lecture enregistrée pour le moment.",
+    "importHelp": "Si le plugin <b>Playback Reporting</b> est installé, son historique antérieur à JellyWrapped peut être importé (les doublons sont ignorés).",
+    "importButton": "Importer depuis Playback Reporting",
+    "importReading": "Lecture de l'historique Playback Reporting…",
+    "importProgress": "Import… {n} %",
+    "importDone": "{imported} lectures importées sur {total} (les lectures déjà connues, postérieures à l'installation, ou d'éléments supprimés sont ignorées).",
+    "importFailed": "Échec : le plugin Playback Reporting est-il installé ?"
+  },
+  "users": {
+    "title": "Wrapped des utilisateurs",
+    "settingsLink": "Réglages de JellyWrapped",
+    "year": "Année",
+    "serverMinutes": "minutes sur le serveur",
+    "activeUsers": "utilisateurs actifs",
+    "noPlays": "Aucune lecture en {year}.",
+    "minutesAndPlays": "minutes · {plays} lectures",
+    "music": "Musique",
+    "movies": "Films",
+    "series": "Séries",
+    "artist": "Artiste",
+    "track": "Titre",
+    "movie": "Film",
+    "show": "Série",
+    "labelFormat": "{label} : ",
+    "percent": "{n}\u00a0%",
+    "estimates": "contient des estimations",
+    "shared": "partagé publiquement",
+    "view": "Voir le Wrapped",
+    "help": "« Voir le Wrapped » ouvre le récapitulatif complet de l'utilisateur dans un nouvel onglet, tel qu'il le voit.",
+    "error": "Impossible de charger les récapitulatifs."
+  }
+}

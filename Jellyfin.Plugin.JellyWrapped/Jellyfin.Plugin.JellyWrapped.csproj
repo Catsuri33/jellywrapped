@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Configuration\configPage.html;Configuration\usersPage.html" />
-    <EmbeddedResource Include="Web\app.html;Web\app.js;Web\app.css;Web\inject.js" />
+    <EmbeddedResource Include="Web\app.html;Web\app.js;Web\app.css;Web\inject.js;Web\i18n.js;Web\lang-*.json" />
   </ItemGroup>
 
   <ItemGroup>

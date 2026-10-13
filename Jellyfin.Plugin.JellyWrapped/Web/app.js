@@ -12,19 +12,23 @@
     const adminUser = new URLSearchParams(location.search).get('user');
     const adminYear = parseInt(new URLSearchParams(location.search).get('year'), 10) || new Date().getFullYear();
     const dashboardUrl = `${base}/web/#/configurationpage?name=JellyWrappedUsers`;
-    const nf = new Intl.NumberFormat('fr-FR');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const PERSONAS = {
-        'binge-watcher': ['🍿', 'Binge-watcher', 'Un épisode ? Non : toute la saison. Le bouton « épisode suivant » n\'a aucun secret pour toi.'],
-        'night-owl': ['🦉', 'Oiseau de nuit', 'Plus d\'un tiers de ton temps entre 22 h et 5 h. Le calme de la nuit, c\'est ton moment.'],
-        'early-bird': ['🌅', 'Lève-tôt', 'Tu lances tes lectures avant même le premier café. Respect.'],
-        'explorer': ['🧭', 'Explorateur musical', 'Plus de 100 artistes différents : tes oreilles ne tiennent pas en place.'],
-        'music-lover': ['🎧', 'Mélomane', 'La musique d\'abord, le reste ensuite. Ton casque mérite des vacances.'],
-        'cinephile': ['🎬', 'Cinéphile', 'Les films, c\'est ton terrain de jeu. Lumières éteintes, son à fond.'],
-        'series-addict': ['📺', 'Sériephile', 'Les séries ont occupé l\'essentiel de ton année. Tu connais les génériques par cœur.'],
-        'weekend-warrior': ['🛋️', 'Pro du week-end', 'Samedi et dimanche, c\'est sacré : canapé et Jellyfin.'],
-        'eclectic': ['🌈', 'Éclectique', 'Un peu de tout, beaucoup de bon : tu ne te laisses enfermer dans aucune case.']
+    // Set in boot() once the translations are loaded.
+    let t = (key) => key;
+    let nf = new Intl.NumberFormat();
+    let locale;
+
+    const PERSONA_EMOJIS = {
+        'binge-watcher': '🍿',
+        'night-owl': '🦉',
+        'early-bird': '🌅',
+        'explorer': '🧭',
+        'music-lover': '🎧',
+        'cinephile': '🎬',
+        'series-addict': '📺',
+        'weekend-warrior': '🛋️',
+        'eclectic': '🌈'
     };
 
     // ---------- Helpers ----------
@@ -32,12 +36,21 @@
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[c]));
     const fmt = (n) => nf.format(Math.round(n || 0));
     const hours = (minutes) => Math.round((minutes || 0) / 60);
-    const plural = (n, one, many) => `${fmt(n)} ${n > 1 ? many : one}`;
-    const month = (m) => new Date(2000, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long' });
-    const longDate = (iso) => new Date(iso.length === 10 ? iso + 'T12:00:00' : iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    // unit('minute', 3) -> "3 minutes", in the current language.
+    const unit = (name, n) => t(`units.${name}`, { n: Math.round(n || 0) });
+    const minutesShort = (n) => t('units.minutesShort', { n: Math.round(n || 0) });
+    const month = (m) => new Date(2000, m - 1, 1).toLocaleDateString(locale, { month: 'long' });
+    const longDate = (iso) => new Date(iso.length === 10 ? iso + 'T12:00:00' : iso).toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+    const hourLabel = (h) => new Date(2000, 0, 1, h).toLocaleTimeString(locale, { hour: 'numeric' });
     const imageUrl = (id, height) => `${base}/Items/${id}/Images/Primary?fillHeight=${height || 400}&quality=90`;
     const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
     const initials = (name) => esc(String(name || '?').trim().charAt(0).toUpperCase());
+
+    // [emoji, title, description]
+    function persona(key) {
+        const known = PERSONA_EMOJIS[key] ? key : 'eclectic';
+        return [PERSONA_EMOJIS[known], t(`personas.${known}.0`), t(`personas.${known}.1`)];
+    }
 
     function img(id, name, cls, height) {
         if (!id) {
@@ -106,27 +119,26 @@
     }
 
     function loading() {
-        app.innerHTML = '<div class="screen"><div class="spinner" role="status" aria-label="Chargement"></div></div>';
+        app.innerHTML = `<div class="screen"><div class="spinner" role="status" aria-label="${t('app.loading')}"></div></div>`;
     }
 
     function loginScreen() {
         screen(`<h1>JellyWrapped</h1>
-            <p>Connecte-toi à Jellyfin dans ce navigateur pour découvrir ton année en musique, films et séries.</p>
-            <p><a class="btn" href="${base}/web/">Se connecter à Jellyfin</a></p>`);
+            <p>${t('app.login.text')}</p>
+            <p><a class="btn" href="${base}/web/">${t('app.login.button')}</a></p>`);
     }
 
     function errorScreen(message) {
-        screen(`<h1>Oups</h1><p>${esc(message)}</p>
-            <p><button class="btn" onclick="location.reload()">Réessayer</button></p>`);
+        screen(`<h1>${t('app.error.title')}</h1><p>${esc(message)}</p>
+            <p><button class="btn" onclick="location.reload()">${t('app.error.retry')}</button></p>`);
     }
 
     function emptyScreen(report, years) {
-        const since = new Date(report.TrackingSinceUtc).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-        screen(`<h1>Rien à déballer… pour l'instant</h1>
-            <p>Aucune lecture trouvée pour ${report.Year}. JellyWrapped enregistre tes écoutes et visionnages depuis le ${since} :
-            lance un film, une série ou un album, et reviens plus tard !</p>
+        const since = new Date(report.TrackingSinceUtc).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+        screen(`<h1>${t('app.empty.title')}</h1>
+            <p>${t('app.empty.text', { year: String(report.Year), since })}</p>
             ${yearPicker(years, report.Year)}
-            <p><a class="btn ghost" href="${base}/web/">Retour à Jellyfin</a></p>`);
+            <p><a class="btn ghost" href="${base}/web/">${t('app.backToJellyfin')}</a></p>`);
     }
 
     function yearPicker(years, current) {
@@ -164,117 +176,124 @@
 
     function buildSlides(r, ctx) {
         const slides = [];
-        const t = r.Totals;
+        const tot = r.Totals;
         const add = (theme, html) => slides.push({ theme, html });
 
         add('t-intro', `
             <div class="kicker in">JellyWrapped ${r.Year}</div>
-            <h1 class="title in" style="--d:1">Salut ${esc(r.UserName)}&nbsp;👋</h1>
-            <p class="lead in" style="--d:2">Voici ton année ${r.Year} sur Jellyfin : la musique, les films et les séries qui l'ont marquée.</p>
-            <p class="note in" style="--d:3">Touche la droite de l'écran pour avancer.</p>
+            <h1 class="title in" style="--d:1">${t('app.intro.hello', { name: esc(r.UserName) })}</h1>
+            <p class="lead in" style="--d:2">${t('app.intro.text', { year: String(r.Year) })}</p>
+            <p class="note in" style="--d:3">${t('app.intro.hint')}</p>
             ${ctx.shared ? '' : yearPicker(ctx.years, r.Year)}`);
 
-        const days = t.Minutes / 1440;
+        const days = Math.round((tot.Minutes / 1440) * 10) / 10;
+        const spread = { activeDays: unit('day', tot.ActiveDays), items: unit('distinctTitle', tot.DistinctItems) };
         add('t-total', `
-            <div class="kicker in">Au total</div>
-            <p class="lead in" style="--d:1">Cette année, tu as passé</p>
-            <div class="huge in" style="--d:2" data-count="${t.Minutes}">0</div>
-            <p class="title in" style="--d:3">minutes sur Jellyfin</p>
-            <p class="lead in" style="--d:4">${days >= 1 ? `Soit <b>${nf.format(Math.round(days * 10) / 10)} jours</b> non-stop, ` : ''}répartis sur <b>${plural(t.ActiveDays, 'jour', 'jours')}</b> d'activité et <b>${plural(t.DistinctItems, 'titre différent', 'titres différents')}</b>.</p>
-            ${r.ContainsEstimates ? '<p class="note in" style="--d:5">Une partie des films et épisodes, vus avant l\'installation de JellyWrapped, est estimée.</p>' : ''}`);
+            <div class="kicker in">${t('app.total.kicker')}</div>
+            <p class="lead in" style="--d:1">${t('app.total.lead')}</p>
+            <div class="huge in" style="--d:2" data-count="${tot.Minutes}">0</div>
+            <p class="title in" style="--d:3">${t('app.total.unit')}</p>
+            <p class="lead in" style="--d:4">${days >= 1 ? t('app.total.days', { days, ...spread }) : t('app.total.noDays', spread)}</p>
+            ${r.ContainsEstimates ? `<p class="note in" style="--d:5">${t('app.total.estimates')}</p>` : ''}`);
 
         const parts = [
-            ['🎧 Musique', t.MusicMinutes, 'linear-gradient(90deg,#f72585,#b5179e)'],
-            ['🎬 Films', t.MovieMinutes, 'linear-gradient(90deg,#ffbe0b,#fb5607)'],
-            ['📺 Séries', t.SeriesMinutes, 'linear-gradient(90deg,#00f5d4,#00bbf9)']
+            [t('app.split.music'), tot.MusicMinutes, 'linear-gradient(90deg,#f72585,#b5179e)'],
+            [t('app.split.movies'), tot.MovieMinutes, 'linear-gradient(90deg,#ffbe0b,#fb5607)'],
+            [t('app.split.series'), tot.SeriesMinutes, 'linear-gradient(90deg,#00f5d4,#00bbf9)']
         ].filter((p) => p[1] > 0);
         if (parts.length > 1) {
+            const share = (minutes) => (minutes / Math.max(1, tot.Minutes)) * 100;
             add('t-split', `
-                <div class="kicker in">Ton mix</div>
-                <h2 class="title in" style="--d:1">Comment s'est réparti ton temps</h2>
+                <div class="kicker in">${t('app.split.kicker')}</div>
+                <h2 class="title in" style="--d:1">${t('app.split.title')}</h2>
                 <div class="split">${parts.map((p, i) => `
                     <div class="in" style="--d:${i + 2}">
-                        <div class="lbl"><span>${p[0]}</span><span>${Math.round((p[1] / Math.max(1, t.Minutes)) * 100)}&nbsp;%</span></div>
-                        <div class="track"><div class="fill" style="--w:${(p[1] / Math.max(1, t.Minutes)) * 100}%;background:${p[2]}"></div></div>
-                        <div class="note" style="margin-top:4px">${plural(hours(p[1]), 'heure', 'heures')}</div>
+                        <div class="lbl"><span>${p[0]}</span><span>${t('app.split.percent', { n: Math.round(share(p[1])) })}</span></div>
+                        <div class="track"><div class="fill" style="--w:${share(p[1])}%;background:${p[2]}"></div></div>
+                        <div class="note" style="margin-top:4px">${unit('hour', hours(p[1]))}</div>
                     </div>`).join('')}</div>`);
         }
 
         const m = r.Music;
         if (m) {
             add('t-music', `
-                <div class="kicker in">Côté musique</div>
+                <div class="kicker in">${t('app.music.kicker')}</div>
                 <div class="huge in" style="--d:1" data-count="${m.Minutes}">0</div>
-                <p class="title in" style="--d:2">minutes d'écoute</p>
+                <p class="title in" style="--d:2">${t('app.music.unit')}</p>
                 <div class="stats">
-                    <div class="stat in" style="--d:3"><div class="v">${fmt(m.Plays)}</div><div class="l">écoutes</div></div>
-                    <div class="stat in" style="--d:4"><div class="v">${fmt(m.DistinctTracks)}</div><div class="l">titres différents</div></div>
-                    <div class="stat in" style="--d:5"><div class="v">${fmt(m.DistinctArtists)}</div><div class="l">artistes</div></div>
-                    <div class="stat in" style="--d:6"><div class="v">${nf.format(Math.round(m.Minutes / Math.max(1, m.Plays) * 10) / 10)}</div><div class="l">min. par écoute</div></div>
+                    <div class="stat in" style="--d:3"><div class="v">${fmt(m.Plays)}</div><div class="l">${t('app.music.plays')}</div></div>
+                    <div class="stat in" style="--d:4"><div class="v">${fmt(m.DistinctTracks)}</div><div class="l">${t('app.music.distinctTracks')}</div></div>
+                    <div class="stat in" style="--d:5"><div class="v">${fmt(m.DistinctArtists)}</div><div class="l">${t('app.music.artists')}</div></div>
+                    <div class="stat in" style="--d:6"><div class="v">${nf.format(Math.round(m.Minutes / Math.max(1, m.Plays) * 10) / 10)}</div><div class="l">${t('app.music.perPlay')}</div></div>
                 </div>
-                ${m.FirstTrack ? `<p class="lead in" style="--d:7">Ton tout premier morceau de l'année : <b>${esc(m.FirstTrack.Name)}</b>, le ${longDate(m.FirstTrack.Subtitle)}.</p>` : ''}`);
+                ${m.FirstTrack ? `<p class="lead in" style="--d:7">${t('app.music.firstTrack', { name: esc(m.FirstTrack.Name), date: longDate(m.FirstTrack.Subtitle) })}</p>` : ''}`);
 
             const top = m.TopArtists[0];
             if (top) {
                 add('t-artist', `
-                    <div class="kicker in">Ton artiste n°1</div>
+                    <div class="kicker in">${t('app.artist.kicker')}</div>
                     ${img(top.ImageId, top.Name, 'hero-img pop', 600)}
                     <h2 class="title in center" style="--d:2;text-align:center">${esc(top.Name)}</h2>
-                    <p class="lead in" style="--d:3;text-align:center"><b>${plural(top.Minutes, 'minute', 'minutes')}</b> ensemble, sur ${plural(top.Plays, 'écoute', 'écoutes')}.</p>
-                    ${m.TopArtists.length > 1 ? rankedList(m.TopArtists.slice(1, 5), { delay: 4, start: 1, image: 'round', value: (e) => `${fmt(e.Minutes)} min` }) : ''}`);
+                    <p class="lead in" style="--d:3;text-align:center">${t('app.artist.together', { minutes: unit('minute', top.Minutes), plays: unit('play', top.Plays) })}</p>
+                    ${m.TopArtists.length > 1 ? rankedList(m.TopArtists.slice(1, 5), { delay: 4, start: 1, image: 'round', value: (e) => minutesShort(e.Minutes) }) : ''}`);
             }
 
             if (m.TopTracks.length) {
                 add('t-tracks', `
-                    <div class="kicker in">Tes titres préférés</div>
-                    <h2 class="title in" style="--d:1">Tu les as écoutés en boucle</h2>
-                    ${rankedList(m.TopTracks, { delay: 2, image: ' ', value: (e) => plural(e.Plays, 'écoute', 'écoutes') })}`);
+                    <div class="kicker in">${t('app.tracks.kicker')}</div>
+                    <h2 class="title in" style="--d:1">${t('app.tracks.title')}</h2>
+                    ${rankedList(m.TopTracks, { delay: 2, image: ' ', value: (e) => unit('play', e.Plays) })}`);
             }
 
             if (m.TopAlbums.length || m.TopGenres.length) {
                 add('t-albums', `
-                    <div class="kicker in">Albums & genres</div>
-                    ${m.TopAlbums.length ? rankedList(m.TopAlbums.slice(0, 4), { delay: 1, image: ' ', value: (e) => `${fmt(e.Minutes)} min` }) : ''}
-                    ${m.TopGenres.length ? `<p class="lead in" style="--d:6">Tes genres du moment :</p>${chips(m.TopGenres)}` : ''}`);
+                    <div class="kicker in">${t('app.albums.kicker')}</div>
+                    ${m.TopAlbums.length ? rankedList(m.TopAlbums.slice(0, 4), { delay: 1, image: ' ', value: (e) => minutesShort(e.Minutes) }) : ''}
+                    ${m.TopGenres.length ? `<p class="lead in" style="--d:6">${t('app.albums.genres')}</p>${chips(m.TopGenres)}` : ''}`);
             }
         }
 
         const mv = r.Movies;
         if (mv) {
-            const longest = mv.Longest ? `<p class="lead in" style="--d:6">Ton plus long film : <b>${esc(mv.Longest.Name)}</b>, ${plural(mv.Longest.Minutes, 'minute', 'minutes')}. Bravo pour l'endurance.</p>` : '';
+            const longest = mv.Longest
+                ? `<p class="lead in" style="--d:6">${t('app.movies.longest', { name: esc(mv.Longest.Name), minutes: unit('minute', mv.Longest.Minutes) })}</p>`
+                : '';
+            const decade = mv.FavoriteDecade
+                ? t('app.movies.decadeLabel', { decade: mv.FavoriteDecade < 2000 ? String(mv.FavoriteDecade).slice(-2) : String(mv.FavoriteDecade) })
+                : '';
             add('t-movies', `
-                <div class="kicker in">Côté cinéma</div>
-                <h2 class="title in" style="--d:1"><span class="hl">${plural(mv.DistinctMovies, 'film', 'films')}</span> et ${plural(hours(mv.Minutes), 'heure', 'heures')} devant l'écran</h2>
+                <div class="kicker in">${t('app.movies.kicker')}</div>
+                <h2 class="title in" style="--d:1">${t('app.movies.title', { movies: unit('movie', mv.DistinctMovies), hours: unit('hour', hours(mv.Minutes)) })}</h2>
                 <div class="posters">${mv.TopMovies.slice(0, 3).map((e, i) => `
                     <div class="p in" style="--d:${i + 2}">${img(e.ImageId, e.Name, 'ph', 450)}<div class="cap">${i + 1}. ${esc(e.Name)}</div></div>`).join('')}</div>
                 ${mv.TopGenres.length ? chips(mv.TopGenres) : ''}
-                ${mv.FavoriteDecade ? `<p class="lead in" style="--d:5">Ta décennie préférée : <b>les années ${mv.FavoriteDecade < 2000 ? String(mv.FavoriteDecade).slice(-2) : mv.FavoriteDecade}</b>.</p>` : ''}
+                ${decade ? `<p class="lead in" style="--d:5">${t('app.movies.decade', { decade })}</p>` : ''}
                 ${longest}`);
 
             const actor = mv.TopActors[0];
             if (actor && actor.Plays >= 2) {
                 add('t-actor', `
-                    <div class="kicker in">Ta tête d'affiche</div>
+                    <div class="kicker in">${t('app.actor.kicker')}</div>
                     ${img(actor.ImageId, actor.Name, 'hero-img poster pop', 600)}
                     <h2 class="title in" style="--d:2;text-align:center">${esc(actor.Name)}</h2>
-                    <p class="lead in" style="--d:3;text-align:center">À l'affiche de <b>${actor.Plays} de tes films</b> cette année.</p>`);
+                    <p class="lead in" style="--d:3;text-align:center">${t('app.actor.text', { n: actor.Plays })}</p>`);
             }
         }
 
         const s = r.Series;
         if (s) {
             add('t-series', `
-                <div class="kicker in">Côté séries</div>
-                <h2 class="title in" style="--d:1"><span class="hl">${plural(s.Episodes, 'épisode', 'épisodes')}</span> de ${plural(s.DistinctSeries, 'série', 'séries')}</h2>
-                ${rankedList(s.TopSeries, { delay: 2, image: 'poster', value: (e) => plural(e.Plays, 'ép.', 'ép.') })}
+                <div class="kicker in">${t('app.series.kicker')}</div>
+                <h2 class="title in" style="--d:1">${t('app.series.title', { episodes: unit('episode', s.Episodes), series: unit('series', s.DistinctSeries) })}</h2>
+                ${rankedList(s.TopSeries, { delay: 2, image: 'poster', value: (e) => unit('episodeShort', e.Plays) })}
                 ${s.TopGenres.length ? chips(s.TopGenres.slice(0, 4)) : ''}`);
 
             if (s.Binge && s.Binge.Episodes >= 3) {
                 add('t-binge', `
-                    <div class="kicker in">Record de binge</div>
+                    <div class="kicker in">${t('app.binge.kicker')}</div>
                     ${img(s.Binge.ImageId, s.Binge.SeriesName, 'hero-img poster pop', 600)}
-                    <h2 class="title in" style="--d:2;text-align:center">${s.Binge.Episodes} épisodes en une journée</h2>
-                    <p class="lead in" style="--d:3;text-align:center">Le ${longDate(s.Binge.Date)}, <b>${esc(s.Binge.SeriesName)}</b> ne t'a pas lâché.</p>`);
+                    <h2 class="title in" style="--d:2;text-align:center">${t('app.binge.title', { n: s.Binge.Episodes })}</h2>
+                    <p class="lead in" style="--d:3;text-align:center">${t('app.binge.text', { date: longDate(s.Binge.Date), name: esc(s.Binge.SeriesName) })}</p>`);
             }
         }
 
@@ -282,27 +301,28 @@
         const monthLabels = Array.from({ length: 12 }, (_, i) => month(i + 1).charAt(0).toUpperCase());
         const peakHour = h.MinutesByHour.indexOf(Math.max(...h.MinutesByHour));
         add('t-habits', `
-            <div class="kicker in">Tes habitudes</div>
-            <h2 class="title in" style="--d:1">${h.PeakMonth ? `<span class="hl">${capitalize(month(h.PeakMonth))}</span> a été ton mois le plus intense` : 'Ton année, mois par mois'}</h2>
+            <div class="kicker in">${t('app.habits.kicker')}</div>
+            <h2 class="title in" style="--d:1">${h.PeakMonth ? t('app.habits.peakMonth', { month: capitalize(month(h.PeakMonth)) }) : t('app.habits.byMonth')}</h2>
             <div class="in" style="--d:2">${barChart(h.MinutesByMonth, monthLabels, '', (h.PeakMonth || 0) - 1)}</div>
-            <p class="lead in" style="--d:3">Ton heure de pointe : <b>${peakHour} h</b>.</p>
+            <p class="lead in" style="--d:3">${t('app.habits.peakHour', { hour: hourLabel(peakHour) })}</p>
             <div class="in" style="--d:3">${barChart(h.MinutesByHour, null, 'hours', peakHour)}</div>
             <div class="stats">
-                <div class="stat in" style="--d:4"><div class="v">${plural(h.LongestStreakDays, 'jour', 'jours')}</div><div class="l">ta plus longue série d'affilée</div></div>
-                <div class="stat in" style="--d:5"><div class="v">${fmt(h.PeakDayMinutes)} min</div><div class="l">${h.PeakDay ? `le ${longDate(h.PeakDay)}, ` : ''}ton jour record</div></div>
+                <div class="stat in" style="--d:4"><div class="v">${unit('day', h.LongestStreakDays)}</div><div class="l">${t('app.habits.streak')}</div></div>
+                <div class="stat in" style="--d:5"><div class="v">${minutesShort(h.PeakDayMinutes)}</div><div class="l">${h.PeakDay ? t('app.habits.peakDay', { date: longDate(h.PeakDay) }) : t('app.habits.peakDayNoDate')}</div></div>
             </div>`);
 
         if (r.Server && r.Server.Users >= 3) {
+            const first = r.Server.Rank === 1;
             add('t-server', `
-                <div class="kicker in">Sur ce serveur</div>
-                <p class="lead in" style="--d:1">Parmi les ${r.Server.Users} utilisateurs actifs, tu ${r.Server.Rank === 1 ? 'es le' : 'fais partie du'}</p>
-                <div class="huge in" style="--d:2">${r.Server.Rank === 1 ? 'n°1' : `top ${r.Server.TopPercent}&nbsp;%`}</div>
-                <p class="title in" style="--d:3">${r.Server.Rank === 1 ? 'Personne n\'a passé plus de temps sur Jellyfin que toi cette année.' : `Tu es ${r.Server.Rank}<sup>e</sup> au classement du temps passé.`}</p>`);
+                <div class="kicker in">${t('app.server.kicker')}</div>
+                <p class="lead in" style="--d:1">${t(first ? 'app.server.leadFirst' : 'app.server.leadTop', { n: r.Server.Users })}</p>
+                <div class="huge in" style="--d:2">${first ? t('app.server.first') : t('app.server.top', { n: r.Server.TopPercent })}</div>
+                <p class="title in" style="--d:3">${first ? t('app.server.firstText') : t('app.server.rankText', { rank: r.Server.Rank })}</p>`);
         }
 
-        const p = PERSONAS[r.Persona] || PERSONAS.eclectic;
+        const p = persona(r.Persona);
         add('t-persona', `
-            <div class="kicker in center" style="text-align:center">Ton profil ${r.Year}</div>
+            <div class="kicker in center" style="text-align:center">${t('app.persona.kicker', { year: String(r.Year) })}</div>
             <div class="persona-emoji pop" style="--d:1">${p[0]}</div>
             <h2 class="title in" style="--d:2;text-align:center">${p[1]}</h2>
             <p class="lead in" style="--d:3;text-align:center">${p[2]}</p>`);
@@ -315,35 +335,40 @@
         const list = (entries) => `<ol>${entries.slice(0, 5).map((e) => `<li>${esc(e.Name)}</li>`).join('')}</ol>`;
         const blocks = [];
         if (r.Music?.TopArtists.length) {
-            blocks.push(`<div><h4>Top artistes</h4>${list(r.Music.TopArtists)}</div>`);
+            blocks.push(`<div><h4>${t('app.summary.topArtists')}</h4>${list(r.Music.TopArtists)}</div>`);
         }
 
         if (r.Music?.TopTracks.length) {
-            blocks.push(`<div><h4>Top titres</h4>${list(r.Music.TopTracks)}</div>`);
+            blocks.push(`<div><h4>${t('app.summary.topTracks')}</h4>${list(r.Music.TopTracks)}</div>`);
         }
 
         if (r.Movies?.TopMovies.length) {
-            blocks.push(`<div><h4>Top films</h4>${list(r.Movies.TopMovies)}</div>`);
+            blocks.push(`<div><h4>${t('app.summary.topMovies')}</h4>${list(r.Movies.TopMovies)}</div>`);
         }
 
         if (r.Series?.TopSeries.length) {
-            blocks.push(`<div><h4>Top séries</h4>${list(r.Series.TopSeries)}</div>`);
+            blocks.push(`<div><h4>${t('app.summary.topSeries')}</h4>${list(r.Series.TopSeries)}</div>`);
         }
 
-        const p = PERSONAS[r.Persona] || PERSONAS.eclectic;
-        const shareBlock = ctx.admin
-            ? `<a class="btn ghost" href="${dashboardUrl}">Retour au tableau de bord</a>`
-            : ctx.shared
-            ? `<a class="btn ghost" href="${base}/web/">Découvrir Jellyfin</a>`
-            : `<button class="btn" data-action="image">Enregistrer l'image</button>
-               ${ctx.sharingEnabled ? `<button class="btn ghost" data-action="link">${ctx.shareToken ? 'Lien public' : 'Créer un lien public'}</button>` : ''}`;
+        const p = persona(r.Persona);
+        let shareBlock;
+        if (ctx.admin) {
+            shareBlock = `<a class="btn ghost" href="${dashboardUrl}">${t('app.backToDashboard')}</a>`;
+        } else if (ctx.shared) {
+            shareBlock = `<a class="btn ghost" href="${base}/web/">${t('app.summary.discover')}</a>`;
+        } else {
+            shareBlock = `<button class="btn" data-action="image">${t('app.summary.saveImage')}</button>`;
+            if (ctx.sharingEnabled) {
+                shareBlock += `<button class="btn ghost" data-action="link">${t(ctx.shareToken ? 'app.summary.publicLink' : 'app.summary.createLink')}</button>`;
+            }
+        }
 
         return `
-            <div class="kicker in">${ctx.shared ? `L'année de ${esc(r.UserName)}` : 'Ton année en résumé'}</div>
+            <div class="kicker in">${ctx.shared ? t('app.summary.sharedKicker', { name: esc(r.UserName) }) : t('app.summary.kicker')}</div>
             <div class="summary in" style="--d:1">
                 <div class="full" style="display:flex;justify-content:space-between;align-items:flex-end">
-                    <div><h4>Minutes</h4><div class="big">${fmt(r.Totals.Minutes)}</div></div>
-                    <div style="text-align:right"><h4>Profil</h4><div style="font-weight:800">${p[0]} ${p[1]}</div></div>
+                    <div><h4>${t('app.summary.minutes')}</h4><div class="big">${fmt(r.Totals.Minutes)}</div></div>
+                    <div style="text-align:right"><h4>${t('app.summary.persona')}</h4><div style="font-weight:800">${p[0]} ${p[1]}</div></div>
                 </div>
                 ${blocks.join('')}
             </div>
@@ -366,7 +391,7 @@
                 <div class="story" tabindex="0">
                     <div class="bars">${slides.map(() => '<div class="bar"><i></i></div>').join('')}</div>
                     <div class="topbar"><span class="brand">JellyWrapped ${report.Year}</span>
-                        <button class="icon-btn interactive" data-action="close" aria-label="Fermer">✕</button></div>
+                        <button class="icon-btn interactive" data-action="close" aria-label="${t('app.close')}">✕</button></div>
                     ${slides.map((s, i) => `<section class="slide ${s.theme}" data-index="${i}" hidden>${s.html}</section>`).join('')}
                     <div class="nav-zone prev" aria-hidden="true"></div>
                     <div class="nav-zone next" aria-hidden="true"></div>
@@ -520,14 +545,14 @@
 
             const url = `${location.origin}${base}/JellyWrapped/App/?share=${encodeURIComponent(ctx.shareToken)}`;
             area.innerHTML = `
-                <div class="share-link"><input readonly value="${esc(url)}" aria-label="Lien public">
-                    <button class="btn" data-copy>Copier</button><button class="btn ghost" data-revoke>Supprimer</button></div>
-                <p class="note" style="margin-top:6px">Toute personne qui a ce lien voit ce résumé, figé à aujourd'hui${location.hostname === 'localhost' ? '' : ', si ton serveur est accessible depuis Internet'}.</p>`;
+                <div class="share-link"><input readonly value="${esc(url)}" aria-label="${t('app.share.linkLabel')}">
+                    <button class="btn" data-copy>${t('app.share.copy')}</button><button class="btn ghost" data-revoke>${t('app.share.revoke')}</button></div>
+                <p class="note" style="margin-top:6px">${t('app.share.note')}</p>`;
             area.querySelector('[data-copy]').onclick = async (e) => {
                 e.stopPropagation();
                 try {
                     await navigator.clipboard.writeText(url);
-                    toast('Lien copié');
+                    toast(t('app.share.copied'));
                 } catch {
                     area.querySelector('input').select();
                 }
@@ -537,10 +562,10 @@
                 await api(`Shares/${report.Year}`, { method: 'DELETE' });
                 ctx.shareToken = null;
                 area.innerHTML = '';
-                toast('Lien supprimé');
+                toast(t('app.share.revoked'));
             };
         } catch {
-            toast('Impossible de créer le lien');
+            toast(t('app.share.linkError'));
         }
     }
 
@@ -582,15 +607,15 @@
         });
 
         const fit = (text, max) => {
-            let t = String(text || '');
-            while (c.measureText(t).width > max && t.length > 1) {
-                t = t.slice(0, -2).trimEnd() + '…';
-                if (t.length <= 2) {
+            let s = String(text || '');
+            while (c.measureText(s).width > max && s.length > 1) {
+                s = s.slice(0, -2).trimEnd() + '…';
+                if (s.length <= 2) {
                     break;
                 }
             }
 
-            return t;
+            return s;
         };
 
         c.fillStyle = '#ffd84d';
@@ -598,7 +623,7 @@
         c.fillText(`JELLYWRAPPED ${r.Year}`, 80, 130);
         c.fillStyle = '#fff';
         c.font = font(900, 84);
-        c.fillText(fit(`L'année de ${r.UserName}`, W - 160), 80, 230);
+        c.fillText(fit(t('app.summary.sharedKicker', { name: r.UserName }), W - 160), 80, 230);
 
         // Hero image: top artist, else top movie, else top series.
         const heroEntry = r.Music?.TopArtists[0] || r.Movies?.TopMovies[0] || r.Series?.TopSeries[0];
@@ -619,19 +644,19 @@
         let y = hero ? 920 : 380;
         const columns = [];
         if (r.Music?.TopArtists.length) {
-            columns.push(['Top artistes', r.Music.TopArtists]);
+            columns.push([t('app.summary.topArtists'), r.Music.TopArtists]);
         }
 
         if (r.Music?.TopTracks.length) {
-            columns.push(['Top titres', r.Music.TopTracks]);
+            columns.push([t('app.summary.topTracks'), r.Music.TopTracks]);
         }
 
         if (r.Movies?.TopMovies.length) {
-            columns.push(['Top films', r.Movies.TopMovies]);
+            columns.push([t('app.summary.topMovies'), r.Movies.TopMovies]);
         }
 
         if (r.Series?.TopSeries.length) {
-            columns.push(['Top séries', r.Series.TopSeries]);
+            columns.push([t('app.summary.topSeries'), r.Series.TopSeries]);
         }
 
         const colW = (W - 160 - 40) / 2;
@@ -653,12 +678,12 @@
         c.fill();
         c.fillStyle = '#ffd84d';
         c.font = font(800, 30);
-        c.fillText('MINUTES', 110, y + 20);
-        c.fillText('PROFIL', W / 2 + 20, y + 20);
+        c.fillText(t('app.summary.minutes').toUpperCase(), 110, y + 20);
+        c.fillText(t('app.summary.persona').toUpperCase(), W / 2 + 20, y + 20);
         c.fillStyle = '#fff';
         c.font = font(900, 76);
         c.fillText(fmt(r.Totals.Minutes), 110, y + 105);
-        const p = PERSONAS[r.Persona] || PERSONAS.eclectic;
+        const p = persona(r.Persona);
         c.font = font(800, 50);
         c.fillText(fit(`${p[0]} ${p[1]}`, W / 2 - 120), W / 2 + 20, y + 100);
 
@@ -672,7 +697,7 @@
             const file = new File([blob], `jellywrapped-${report.Year}.png`, { type: 'image/png' });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
-                    await navigator.share({ files: [file], title: `Mon JellyWrapped ${report.Year}` });
+                    await navigator.share({ files: [file], title: t('app.share.title', { year: String(report.Year) }) });
                     return;
                 } catch (e) {
                     if (e.name === 'AbortError') {
@@ -686,9 +711,9 @@
             a.download = file.name;
             a.click();
             setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-            toast('Image enregistrée');
+            toast(t('app.share.imageSaved'));
         } catch {
-            toast('Impossible de générer l\'image');
+            toast(t('app.share.imageError'));
         } finally {
             button.disabled = false;
         }
@@ -711,7 +736,7 @@
             if (e.status === 401) {
                 loginScreen();
             } else {
-                errorScreen('Impossible de charger ton récapitulatif.');
+                errorScreen(t('app.error.loadOwn'));
             }
         }
     }
@@ -720,13 +745,28 @@
         app.querySelectorAll('[data-year]').forEach((b) => b.addEventListener('click', () => loadYear(+b.dataset.year, years)));
     }
 
+    async function loadTranslations() {
+        try {
+            // The signed-in user's language, even when viewing someone's share link.
+            const i18n = await window.JellyWrappedI18n.load(getCredentials()?.UserId);
+            t = i18n.t;
+            nf = i18n.numbers;
+            locale = i18n.locale;
+            document.documentElement.lang = i18n.language;
+        } catch {
+            // Keep the default: keys are shown instead of text.
+        }
+    }
+
     async function boot() {
+        await loadTranslations();
+
         if (shareToken) {
             try {
                 const data = await api(`Shared/${encodeURIComponent(shareToken)}`);
                 play(data.Report, { shared: true });
             } catch {
-                errorScreen('Ce lien de partage n\'existe pas ou n\'est plus actif.');
+                errorScreen(t('app.error.shareMissing'));
             }
 
             return;
@@ -743,13 +783,11 @@
                 if (data.Report.HasData) {
                     play(data.Report, { shared: true, admin: true });
                 } else {
-                    screen(`<h1>Rien à afficher</h1><p>${esc(data.Report.UserName)} n'a aucune lecture en ${adminYear}.</p>
-                        <p><a class="btn" href="${dashboardUrl}">Retour au tableau de bord</a></p>`);
+                    screen(`<h1>${t('app.empty.adminTitle')}</h1><p>${t('app.empty.adminText', { name: esc(data.Report.UserName), year: String(adminYear) })}</p>
+                        <p><a class="btn" href="${dashboardUrl}">${t('app.backToDashboard')}</a></p>`);
                 }
             } catch (e) {
-                errorScreen(e.status === 403 || e.status === 401
-                    ? 'Seuls les administrateurs peuvent voir le récapitulatif des autres utilisateurs.'
-                    : 'Impossible de charger ce récapitulatif.');
+                errorScreen(e.status === 403 || e.status === 401 ? t('app.error.adminOnly') : t('app.error.loadOther'));
             }
 
             return;
@@ -762,7 +800,7 @@
             if (e.status === 401) {
                 loginScreen();
             } else {
-                errorScreen('Impossible de joindre le serveur.');
+                errorScreen(t('app.error.unreachable'));
             }
         }
     }

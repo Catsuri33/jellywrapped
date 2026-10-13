@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Wrapped des utilisateurs</title>
+    <title>Users' Wrapped</title>
 </head>
 <body>
     <div id="JellyWrappedUsersPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select">
@@ -32,19 +32,19 @@
             <div class="content-primary">
                 <div class="jw-head">
                     <div>
-                        <h2>Wrapped des utilisateurs</h2>
-                        <a id="JellyWrappedSettingsLink" is="emby-linkbutton" class="button-link" href="#">Réglages de JellyWrapped</a>
+                        <h2 data-jw="users.title">Users' Wrapped</h2>
+                        <a id="JellyWrappedSettingsLink" is="emby-linkbutton" class="button-link" href="#" data-jw="users.settingsLink">JellyWrapped settings</a>
                     </div>
                     <div class="jw-tools">
                         <div class="selectContainer">
-                            <label class="selectLabel" for="JellyWrappedYear">Année</label>
+                            <label class="selectLabel" for="JellyWrappedYear" data-jw="users.year">Year</label>
                             <select is="emby-select" id="JellyWrappedYear" class="emby-select-withcolor emby-select"></select>
                         </div>
                     </div>
                 </div>
                 <div id="JellyWrappedSummary" class="jw-summary"></div>
                 <div id="JellyWrappedGrid" class="jw-grid"></div>
-                <p class="fieldDescription">« Voir le Wrapped » ouvre le récapitulatif complet de l'utilisateur dans un nouvel onglet, tel qu'il le voit.</p>
+                <p class="fieldDescription" data-jw="users.help"></p>
             </div>
         </div>
         <script type="text/javascript">
@@ -53,13 +53,31 @@
                 var yearSelect = page.querySelector('#JellyWrappedYear');
                 var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
                 var nf = new Intl.NumberFormat();
-                var personas = {
-                    'binge-watcher': '🍿 Binge-watcher', 'night-owl': '🦉 Oiseau de nuit', 'early-bird': '🌅 Lève-tôt',
-                    'explorer': '🧭 Explorateur musical', 'music-lover': '🎧 Mélomane', 'cinephile': '🎬 Cinéphile',
-                    'series-addict': '📺 Sériephile', 'weekend-warrior': '🛋️ Pro du week-end', 'eclectic': '🌈 Éclectique'
+                var t = function (key) { return key; };
+                var emojis = {
+                    'binge-watcher': '🍿', 'night-owl': '🦉', 'early-bird': '🌅', 'explorer': '🧭', 'music-lover': '🎧',
+                    'cinephile': '🎬', 'series-addict': '📺', 'weekend-warrior': '🛋️', 'eclectic': '🌈'
                 };
                 var colors = { MusicMinutes: '#f72585', MovieMinutes: '#fb8500', SeriesMinutes: '#00bbf9' };
-                var labels = { MusicMinutes: 'Musique', MovieMinutes: 'Films', SeriesMinutes: 'Séries' };
+                var labels = { MusicMinutes: 'users.music', MovieMinutes: 'users.movies', SeriesMinutes: 'users.series' };
+
+                // Loads the plugin translations and applies them to the [data-jw] elements.
+                function translate() {
+                    var ready = window.JellyWrappedI18n ? Promise.resolve() : new Promise(function (resolve, reject) {
+                        var tag = document.createElement('script');
+                        tag.src = ApiClient.getUrl('JellyWrapped/App/i18n.js');
+                        tag.onload = resolve;
+                        tag.onerror = reject;
+                        document.head.appendChild(tag);
+                    });
+                    return ready.then(function () {
+                        return window.JellyWrappedI18n.load(ApiClient.getCurrentUserId());
+                    }).then(function (i18n) {
+                        t = i18n.t;
+                        nf = i18n.numbers;
+                        page.querySelectorAll('[data-jw]').forEach(function (node) { node.textContent = t(node.getAttribute('data-jw')); });
+                    });
+                }
 
                 function el(tag, className, text) {
                     var node = document.createElement(tag);
@@ -74,9 +92,9 @@
                     return node;
                 }
 
-                function top(label, value) {
+                function top(labelKey, value) {
                     var row = el('div');
-                    row.appendChild(el('span', '', label + ' : '));
+                    row.appendChild(el('span', '', t('users.labelFormat', { label: t(labelKey) })));
                     row.appendChild(document.createTextNode(value));
                     row.title = value;
                     return row;
@@ -86,34 +104,35 @@
                     var c = el('div', 'jw-card' + (user.HasData ? '' : ' empty'));
                     var name = el('div', 'jw-name');
                     name.appendChild(el('span', '', user.UserName));
-                    if (user.HasData) {
-                        name.appendChild(el('span', 'jw-persona', personas[user.Persona] || ''));
+                    if (user.HasData && emojis[user.Persona]) {
+                        name.appendChild(el('span', 'jw-persona', emojis[user.Persona] + ' ' + t('personas.' + user.Persona + '.0')));
                     }
 
                     c.appendChild(name);
                     if (!user.HasData) {
-                        c.appendChild(el('div', '', 'Aucune lecture en ' + year + '.'));
+                        c.appendChild(el('div', '', t('users.noPlays', { year: String(year) })));
                         return c;
                     }
 
-                    var t = user.Totals;
-                    var minutes = el('div', 'jw-minutes', nf.format(t.Minutes) + ' ');
-                    minutes.appendChild(el('small', '', 'minutes · ' + nf.format(t.Plays) + ' lectures'));
+                    var totals = user.Totals;
+                    var minutes = el('div', 'jw-minutes', nf.format(totals.Minutes) + ' ');
+                    minutes.appendChild(el('small', '', t('users.minutesAndPlays', { plays: totals.Plays })));
                     c.appendChild(minutes);
 
                     var bar = el('div', 'jw-bar');
                     var legend = el('div', 'jw-legend');
                     Object.keys(colors).forEach(function (key) {
-                        if (t[key] > 0) {
+                        if (totals[key] > 0) {
+                            var share = totals[key] / Math.max(1, totals.Minutes) * 100;
                             var part = el('div');
-                            part.style.width = (t[key] / Math.max(1, t.Minutes) * 100) + '%';
+                            part.style.width = share + '%';
                             part.style.background = colors[key];
                             bar.appendChild(part);
                             var item = el('span');
                             var dot = el('i');
                             dot.style.background = colors[key];
                             item.appendChild(dot);
-                            item.appendChild(document.createTextNode(labels[key] + ' ' + Math.round(t[key] / Math.max(1, t.Minutes) * 100) + ' %'));
+                            item.appendChild(document.createTextNode(t(labels[key]) + ' ' + t('users.percent', { n: Math.round(share) })));
                             legend.appendChild(item);
                         }
                     });
@@ -121,38 +140,27 @@
                     c.appendChild(legend);
 
                     var tops = el('div', 'jw-tops');
-                    if (user.TopArtist) {
-                        tops.appendChild(top('Artiste', user.TopArtist));
-                    }
-
-                    if (user.TopTrack) {
-                        tops.appendChild(top('Titre', user.TopTrack));
-                    }
-
-                    if (user.TopMovie) {
-                        tops.appendChild(top('Film', user.TopMovie));
-                    }
-
-                    if (user.TopSeries) {
-                        tops.appendChild(top('Série', user.TopSeries));
-                    }
-
+                    [['TopArtist', 'users.artist'], ['TopTrack', 'users.track'], ['TopMovie', 'users.movie'], ['TopSeries', 'users.show']].forEach(function (entry) {
+                        if (user[entry[0]]) {
+                            tops.appendChild(top(entry[1], user[entry[0]]));
+                        }
+                    });
                     c.appendChild(tops);
 
                     var info = [];
                     if (user.ContainsEstimates) {
-                        info.push('contient des estimations');
+                        info.push(t('users.estimates'));
                     }
 
                     if (user.Shared) {
-                        info.push('partagé publiquement');
+                        info.push(t('users.shared'));
                     }
 
                     if (info.length) {
                         c.appendChild(el('div', 'fieldDescription', info.join(' · ')));
                     }
 
-                    var link = el('a', 'raised emby-button', 'Voir le Wrapped');
+                    var link = el('a', 'raised emby-button', t('users.view'));
                     link.href = ApiClient.getUrl('JellyWrapped/App/') + '?user=' + encodeURIComponent(user.UserId) + '&year=' + year;
                     link.target = '_blank';
                     link.rel = 'noopener';
@@ -180,7 +188,7 @@
                         var total = active.reduce(function (sum, u) { return sum + u.Totals.Minutes; }, 0);
                         var summary = page.querySelector('#JellyWrappedSummary');
                         summary.innerHTML = '';
-                        [[nf.format(total), 'minutes sur le serveur'], [active.length + ' / ' + data.Users.length, 'utilisateurs actifs']].forEach(function (s) {
+                        [[nf.format(total), t('users.serverMinutes')], [active.length + ' / ' + data.Users.length, t('users.activeUsers')]].forEach(function (s) {
                             var block = el('div');
                             block.appendChild(el('b', '', s[0]));
                             block.appendChild(document.createTextNode(s[1]));
@@ -196,7 +204,7 @@
                         Dashboard.hideLoadingMsg();
                     }).catch(function () {
                         Dashboard.hideLoadingMsg();
-                        page.querySelector('#JellyWrappedGrid').textContent = 'Impossible de charger les récapitulatifs.';
+                        page.querySelector('#JellyWrappedGrid').textContent = t('users.error');
                     });
                 }
 
@@ -204,7 +212,9 @@
 
                 page.addEventListener('pageshow', function () {
                     page.querySelector('#JellyWrappedSettingsLink').href = '#/configurationpage?name=JellyWrapped';
-                    load(yearSelect.value || null);
+                    translate().catch(function () { /* Keep the English defaults. */ }).then(function () {
+                        load(yearSelect.value || null);
+                    });
                 });
             })();
         </script>

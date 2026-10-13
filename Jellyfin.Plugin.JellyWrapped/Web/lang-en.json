@@ -1,0 +1,229 @@
+{
+  "_locale": "en-US",
+  "units": {
+    "minute": { "one": "{n} minute", "other": "{n} minutes" },
+    "hour": { "one": "{n} hour", "other": "{n} hours" },
+    "day": { "one": "{n} day", "other": "{n} days" },
+    "play": { "one": "{n} play", "other": "{n} plays" },
+    "distinctTitle": { "one": "{n} different title", "other": "{n} different titles" },
+    "movie": { "one": "{n} movie", "other": "{n} movies" },
+    "episode": { "one": "{n} episode", "other": "{n} episodes" },
+    "episodeShort": { "one": "{n} ep.", "other": "{n} eps." },
+    "series": { "one": "{n} series", "other": "{n} series" },
+    "minutesShort": "{n} min"
+  },
+  "app": {
+    "loading": "Loading",
+    "close": "Close",
+    "login": {
+      "text": "Sign in to Jellyfin in this browser to discover your year in music, movies and series.",
+      "button": "Sign in to Jellyfin"
+    },
+    "error": {
+      "title": "Oops",
+      "retry": "Try again",
+      "loadOwn": "Could not load your recap.",
+      "loadOther": "Could not load this recap.",
+      "unreachable": "Could not reach the server.",
+      "shareMissing": "This share link does not exist or is no longer active.",
+      "adminOnly": "Only administrators can see other users' recaps."
+    },
+    "empty": {
+      "title": "Nothing to unwrap… yet",
+      "text": "No plays found for {year}. JellyWrapped has been recording what you listen to and watch since {since}: play a movie, a series or an album, and come back later!",
+      "adminTitle": "Nothing to show",
+      "adminText": "{name} has no plays in {year}."
+    },
+    "backToJellyfin": "Back to Jellyfin",
+    "backToDashboard": "Back to the dashboard",
+    "intro": {
+      "hello": "Hi {name}&nbsp;👋",
+      "text": "Here is your {year} on Jellyfin: the music, movies and series that made it.",
+      "hint": "Tap the right side of the screen to continue."
+    },
+    "total": {
+      "kicker": "All in all",
+      "lead": "This year, you spent",
+      "unit": "minutes on Jellyfin",
+      "days": "That's <b>{days} days</b> non-stop, spread over <b>{activeDays}</b> of activity and <b>{items}</b>.",
+      "noDays": "Spread over <b>{activeDays}</b> of activity and <b>{items}</b>.",
+      "estimates": "Some movies and episodes, watched before JellyWrapped was installed, are estimated."
+    },
+    "split": {
+      "kicker": "Your mix",
+      "title": "How you spent your time",
+      "music": "🎧 Music",
+      "movies": "🎬 Movies",
+      "series": "📺 Series",
+      "percent": "{n}%"
+    },
+    "music": {
+      "kicker": "Music",
+      "unit": "minutes listened",
+      "plays": "plays",
+      "distinctTracks": "different tracks",
+      "artists": "artists",
+      "perPlay": "min. per play",
+      "firstTrack": "Your very first track of the year: <b>{name}</b>, on {date}."
+    },
+    "artist": {
+      "kicker": "Your top artist",
+      "together": "<b>{minutes}</b> together, over {plays}."
+    },
+    "tracks": {
+      "kicker": "Your top tracks",
+      "title": "You had them on repeat"
+    },
+    "albums": {
+      "kicker": "Albums & genres",
+      "genres": "Your genres of the moment:"
+    },
+    "movies": {
+      "kicker": "At the movies",
+      "title": "<span class=\"hl\">{movies}</span> and {hours} in front of the screen",
+      "decade": "Your favourite decade: <b>{decade}</b>.",
+      "decadeLabel": "the {decade}s",
+      "longest": "Your longest movie: <b>{name}</b>, {minutes}. Impressive stamina."
+    },
+    "actor": {
+      "kicker": "Your leading star",
+      "text": "Starring in <b>{n} of your movies</b> this year."
+    },
+    "series": {
+      "kicker": "Series",
+      "title": "<span class=\"hl\">{episodes}</span> from {series}"
+    },
+    "binge": {
+      "kicker": "Binge record",
+      "title": "{n} episodes in a single day",
+      "text": "On {date}, <b>{name}</b> just wouldn't let you go."
+    },
+    "habits": {
+      "kicker": "Your habits",
+      "peakMonth": "<span class=\"hl\">{month}</span> was your busiest month",
+      "byMonth": "Your year, month by month",
+      "peakHour": "Your peak hour: <b>{hour}</b>.",
+      "streak": "your longest streak",
+      "peakDay": "on {date}, your record day",
+      "peakDayNoDate": "your record day"
+    },
+    "server": {
+      "kicker": "On this server",
+      "leadFirst": "Out of {n} active users, you are",
+      "leadTop": "Out of {n} active users, you are in the",
+      "first": "#1",
+      "top": "top {n}%",
+      "firstText": "Nobody spent more time on Jellyfin than you this year.",
+      "rankText": "You rank #{rank} for time spent."
+    },
+    "persona": {
+      "kicker": "Your {year} persona"
+    },
+    "summary": {
+      "kicker": "Your year in review",
+      "sharedKicker": "{name}'s year",
+      "minutes": "Minutes",
+      "persona": "Persona",
+      "topArtists": "Top artists",
+      "topTracks": "Top tracks",
+      "topMovies": "Top movies",
+      "topSeries": "Top series",
+      "discover": "Discover Jellyfin",
+      "saveImage": "Save image",
+      "createLink": "Create a public link",
+      "publicLink": "Public link"
+    },
+    "share": {
+      "linkLabel": "Public link",
+      "copy": "Copy",
+      "revoke": "Delete",
+      "note": "Anyone with this link can see this recap, frozen as of today, as long as your server is reachable from the Internet.",
+      "copied": "Link copied",
+      "revoked": "Link deleted",
+      "linkError": "Could not create the link",
+      "imageSaved": "Image saved",
+      "imageError": "Could not generate the image",
+      "title": "My JellyWrapped {year}"
+    }
+  },
+  "personas": {
+    "binge-watcher": ["Binge-watcher", "One episode? No: the whole season. The \"next episode\" button holds no secrets for you."],
+    "night-owl": ["Night owl", "More than a third of your time between 10 PM and 5 AM. The quiet of the night is your moment."],
+    "early-bird": ["Early bird", "You press play before your first coffee. Respect."],
+    "explorer": ["Music explorer", "Over 100 different artists: your ears just can't sit still."],
+    "music-lover": ["Music lover", "Music first, everything else later. Your headphones deserve a holiday."],
+    "cinephile": ["Cinephile", "Movies are your playground. Lights off, volume up."],
+    "series-addict": ["Series addict", "Series took up most of your year. You know the opening credits by heart."],
+    "weekend-warrior": ["Weekend warrior", "Saturday and Sunday are sacred: couch and Jellyfin."],
+    "eclectic": ["Eclectic", "A bit of everything, plenty of good stuff: you won't be put in a box."]
+  },
+  "inject": {
+    "menu": "My Wrapped",
+    "bannerTitle": "Your JellyWrapped {year} is ready!",
+    "bannerText": "Your artists, movies and series of the year at a glance.",
+    "bannerButton": "Open",
+    "bannerHide": "Hide"
+  },
+  "settings": {
+    "intro": "Each user's yearly recap is available at",
+    "usersLink": "See every user's Wrapped",
+    "injected": "The \"My Wrapped\" link is added to the Jellyfin menu for all users.",
+    "notInjected": "The File Transformation plugin was not detected: share the address above with your users, or add it to the \"menuLinks\" of jellyfin-web's config.json.",
+    "tracking": "Tracking",
+    "minAudio": "Minimum listening time for a track (seconds)",
+    "minAudioHelp": "Below this, the track counts as skipped and is not recorded.",
+    "minVideo": "Minimum watching time for a video (seconds)",
+    "estimates": "Estimate earlier history",
+    "estimatesHelp": "Movies and episodes marked as played this year, but watched before the plugin was installed, are counted once, for their full length.",
+    "recap": "Recap",
+    "comparison": "Compare with other users",
+    "comparisonHelp": "Shows a ranking (\"top 10% of the server\") when at least 3 users are active. No names are shown.",
+    "sharing": "Allow public share links",
+    "sharingHelp": "Each user can create a link, visible without an account, to a frozen copy of their recap. Turning this off disables every link.",
+    "webLink": "Add \"My Wrapped\" to the Jellyfin menu",
+    "webLinkHelp": "Requires the File Transformation plugin. Applied at the next restart.",
+    "banner": "Home banner",
+    "showBanner": "Announce the recap on the home page",
+    "showBannerHelp": "A \"Your JellyWrapped is ready\" banner is shown during the period below; each user can hide it. Requires the File Transformation plugin.",
+    "fromDay": "From (day)",
+    "toDay": "To (day)",
+    "month": "Month",
+    "bannerWraps": "The period spans New Year: after 1 January, the banner announces the recap of the year that just ended.",
+    "bannerSameYear": "The banner announces the recap of the current year.",
+    "save": "Save",
+    "history": "History",
+    "loading": "Loading…",
+    "trackingSince": "Recording since {date}.",
+    "playsInYear": "{year}: {plays} plays",
+    "noPlays": "No plays recorded yet.",
+    "importHelp": "If the <b>Playback Reporting</b> plugin is installed, its history from before JellyWrapped can be imported (duplicates are skipped).",
+    "importButton": "Import from Playback Reporting",
+    "importReading": "Reading the Playback Reporting history…",
+    "importProgress": "Importing… {n}%",
+    "importDone": "{imported} plays imported out of {total} (plays already known, recorded after the installation, or of deleted items are skipped).",
+    "importFailed": "Failed: is the Playback Reporting plugin installed?"
+  },
+  "users": {
+    "title": "Users' Wrapped",
+    "settingsLink": "JellyWrapped settings",
+    "year": "Year",
+    "serverMinutes": "minutes on the server",
+    "activeUsers": "active users",
+    "noPlays": "No plays in {year}.",
+    "minutesAndPlays": "minutes · {plays} plays",
+    "music": "Music",
+    "movies": "Movies",
+    "series": "Series",
+    "artist": "Artist",
+    "track": "Track",
+    "movie": "Movie",
+    "show": "Series",
+    "labelFormat": "{label}: ",
+    "percent": "{n}%",
+    "estimates": "includes estimates",
+    "shared": "shared publicly",
+    "view": "View Wrapped",
+    "help": "\"View Wrapped\" opens the user's full recap in a new tab, exactly as they see it.",
+    "error": "Could not load the recaps."
+  }
+}

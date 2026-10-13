@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyWrapped.Data;
 using Jellyfin.Plugin.JellyWrapped.Sharing;
@@ -25,13 +26,14 @@ namespace Jellyfin.Plugin.JellyWrapped.Api;
 /// </summary>
 [ApiController]
 [Route("JellyWrapped")]
-public class WrappedController : ControllerBase
+public partial class WrappedController : ControllerBase
 {
     private static readonly Dictionary<string, string> _assets = new(StringComparer.Ordinal)
     {
         ["app.js"] = "text/javascript",
         ["app.css"] = "text/css",
-        ["inject.js"] = "text/javascript"
+        ["inject.js"] = "text/javascript",
+        ["i18n.js"] = "text/javascript"
     };
 
     private readonly WrappedService _wrappedService;
@@ -94,7 +96,15 @@ public class WrappedController : ControllerBase
     [AllowAnonymous]
     [ApiExplorerSettings(IgnoreApi = true)]
     public ActionResult GetAsset([FromRoute] string file)
-        => _assets.TryGetValue(file, out var contentType) ? Asset(file, contentType) : NotFound();
+    {
+        if (_assets.TryGetValue(file, out var contentType))
+        {
+            return Asset(file, contentType);
+        }
+
+        // Translations: lang-<code>.json; the web app falls back to English on 404.
+        return LanguageFileRegex().IsMatch(file) && HasAsset(file) ? Asset(file, MediaTypeNames.Application.Json) : NotFound();
+    }
 
     /// <summary>
     /// Lists the years the current user can see a recap for.
@@ -334,9 +344,16 @@ public class WrappedController : ControllerBase
         return info.User?.Id ?? (info.UserId == Guid.Empty ? null : info.UserId);
     }
 
+    [GeneratedRegex("^lang-[a-z]{2,3}\\.json$")]
+    private static partial Regex LanguageFileRegex();
+
+    private static string ResourceName(string name) => $"{typeof(Plugin).Namespace}.Web.{name}";
+
+    private bool HasAsset(string name) => GetType().Assembly.GetManifestResourceInfo(ResourceName(name)) is not null;
+
     private FileStreamResult Asset(string name, string contentType)
     {
-        var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(Plugin).Namespace}.Web.{name}")
+        var stream = GetType().Assembly.GetManifestResourceStream(ResourceName(name))
             ?? throw new FileNotFoundException(name);
         Response.Headers.CacheControl = "no-cache";
         return File(stream, contentType + "; charset=utf-8");

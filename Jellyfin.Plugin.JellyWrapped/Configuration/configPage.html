@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>JellyWrapped</title>
@@ -10,94 +10,94 @@
             <div class="content-primary">
                 <div class="verticalSection">
                     <h2 class="sectionTitle">JellyWrapped</h2>
-                    <p>Le récapitulatif annuel de chaque utilisateur est disponible à l'adresse
+                    <p><span data-jw="settings.intro">Each user's yearly recap is available at</span>
                         <a id="JellyWrappedAppLink" is="emby-linkbutton" class="button-link" target="_blank" href="#">/JellyWrapped/App/</a>.</p>
-                    <p><a is="emby-linkbutton" class="button-link" href="#/configurationpage?name=JellyWrappedUsers">Voir le Wrapped de chaque utilisateur</a></p>
+                    <p><a is="emby-linkbutton" class="button-link" href="#/configurationpage?name=JellyWrappedUsers" data-jw="settings.usersLink">See every user's Wrapped</a></p>
                     <p id="JellyWrappedInjection" class="fieldDescription"></p>
                 </div>
 
                 <form id="JellyWrappedConfigForm">
-                    <h3>Collecte</h3>
+                    <h3 data-jw="settings.tracking">Tracking</h3>
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="MinAudioSeconds">Durée minimale d'une écoute musicale (secondes)</label>
+                        <label class="inputLabel inputLabelUnfocused" for="MinAudioSeconds" data-jw="settings.minAudio">Minimum listening time for a track (seconds)</label>
                         <input id="MinAudioSeconds" type="number" is="emby-input" min="0" />
-                        <div class="fieldDescription">En dessous, le morceau est considéré comme passé et n'est pas compté.</div>
+                        <div class="fieldDescription" data-jw="settings.minAudioHelp">Below this, the track counts as skipped and is not recorded.</div>
                     </div>
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="MinVideoSeconds">Durée minimale d'un visionnage (secondes)</label>
+                        <label class="inputLabel inputLabelUnfocused" for="MinVideoSeconds" data-jw="settings.minVideo">Minimum watching time for a video (seconds)</label>
                         <input id="MinVideoSeconds" type="number" is="emby-input" min="0" />
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="IncludeEstimatedHistory" type="checkbox" is="emby-checkbox" />
-                            <span>Estimer l'historique antérieur</span>
+                            <span data-jw="settings.estimates">Estimate earlier history</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Les films et épisodes marqués comme vus dans l'année, mais lus avant l'installation du plugin, sont comptés une fois, pour leur durée complète.</div>
+                        <div class="fieldDescription checkboxFieldDescription" data-jw="settings.estimatesHelp"></div>
                     </div>
 
-                    <h3>Récapitulatif</h3>
+                    <h3 data-jw="settings.recap">Recap</h3>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="ShowServerComparison" type="checkbox" is="emby-checkbox" />
-                            <span>Comparer avec les autres utilisateurs</span>
+                            <span data-jw="settings.comparison">Compare with other users</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Affiche un classement (« top 10 % du serveur ») quand au moins 3 utilisateurs sont actifs. Aucun nom n'est montré.</div>
+                        <div class="fieldDescription checkboxFieldDescription" data-jw="settings.comparisonHelp"></div>
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="AllowPublicSharing" type="checkbox" is="emby-checkbox" />
-                            <span>Autoriser les liens de partage publics</span>
+                            <span data-jw="settings.sharing">Allow public share links</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Chaque utilisateur peut créer un lien, visible sans compte, vers une copie figée de son récapitulatif. Désactiver cette option rend tous les liens inactifs.</div>
+                        <div class="fieldDescription checkboxFieldDescription" data-jw="settings.sharingHelp"></div>
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="InjectWebLink" type="checkbox" is="emby-checkbox" />
-                            <span>Ajouter « Mon Wrapped » au menu de Jellyfin</span>
+                            <span data-jw="settings.webLink">Add "My Wrapped" to the Jellyfin menu</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Nécessite le plugin File Transformation. Prise en compte au prochain redémarrage.</div>
+                        <div class="fieldDescription checkboxFieldDescription" data-jw="settings.webLinkHelp"></div>
                     </div>
 
-                    <h3>Bannière d'accueil</h3>
+                    <h3 data-jw="settings.banner">Home banner</h3>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label">
                             <input id="ShowHomeBanner" type="checkbox" is="emby-checkbox" />
-                            <span>Annoncer le récapitulatif sur la page d'accueil</span>
+                            <span data-jw="settings.showBanner">Announce the recap on the home page</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Une bannière « Ton JellyWrapped est prêt » s'affiche pendant la période ci-dessous ; chaque utilisateur peut la masquer. Nécessite le plugin File Transformation.</div>
+                        <div class="fieldDescription checkboxFieldDescription" data-jw="settings.showBannerHelp"></div>
                     </div>
                     <div style="display:flex;gap:1em;flex-wrap:wrap">
                         <div class="inputContainer" style="flex:1;min-width:8em">
-                            <label class="inputLabel inputLabelUnfocused" for="BannerStartDay">Du (jour)</label>
+                            <label class="inputLabel inputLabelUnfocused" for="BannerStartDay" data-jw="settings.fromDay">From (day)</label>
                             <input id="BannerStartDay" type="number" is="emby-input" min="1" max="31" />
                         </div>
                         <div class="selectContainer" style="flex:2;min-width:10em">
-                            <label class="selectLabel" for="BannerStartMonth">Mois</label>
+                            <label class="selectLabel" for="BannerStartMonth" data-jw="settings.month">Month</label>
                             <select is="emby-select" id="BannerStartMonth" class="emby-select-withcolor emby-select jellywrapped-month"></select>
                         </div>
                         <div class="inputContainer" style="flex:1;min-width:8em">
-                            <label class="inputLabel inputLabelUnfocused" for="BannerEndDay">Au (jour)</label>
+                            <label class="inputLabel inputLabelUnfocused" for="BannerEndDay" data-jw="settings.toDay">To (day)</label>
                             <input id="BannerEndDay" type="number" is="emby-input" min="1" max="31" />
                         </div>
                         <div class="selectContainer" style="flex:2;min-width:10em">
-                            <label class="selectLabel" for="BannerEndMonth">Mois</label>
+                            <label class="selectLabel" for="BannerEndMonth" data-jw="settings.month">Month</label>
                             <select is="emby-select" id="BannerEndMonth" class="emby-select-withcolor emby-select jellywrapped-month"></select>
                         </div>
                     </div>
                     <div id="JellyWrappedBannerHint" class="fieldDescription" style="margin-bottom:1.5em"></div>
                     <div>
                         <button is="emby-button" type="submit" class="raised button-submit block emby-button">
-                            <span>Enregistrer</span>
+                            <span data-jw="settings.save">Save</span>
                         </button>
                     </div>
                 </form>
 
                 <div class="verticalSection" style="margin-top:2em">
-                    <h3>Historique</h3>
-                    <div id="JellyWrappedStatus" class="fieldDescription">Chargement…</div>
-                    <p>Si le plugin <b>Playback Reporting</b> est installé, son historique antérieur à JellyWrapped peut être importé (les doublons sont ignorés).</p>
+                    <h3 data-jw="settings.history">History</h3>
+                    <div id="JellyWrappedStatus" class="fieldDescription" data-jw="settings.loading">Loading…</div>
+                    <p data-jw-html="settings.importHelp"></p>
                     <button is="emby-button" type="button" id="JellyWrappedImport" class="raised emby-button">
-                        <span>Importer depuis Playback Reporting</span>
+                        <span data-jw="settings.importButton">Import from Playback Reporting</span>
                     </button>
                     <div id="JellyWrappedImportResult" class="fieldDescription"></div>
                 </div>
@@ -109,15 +109,47 @@
                 var page = document.querySelector('#JellyWrappedConfigPage');
                 var booleans = ['IncludeEstimatedHistory', 'ShowServerComparison', 'AllowPublicSharing', 'InjectWebLink', 'ShowHomeBanner'];
                 var numbers = ['MinAudioSeconds', 'MinVideoSeconds', 'BannerStartDay', 'BannerStartMonth', 'BannerEndDay', 'BannerEndMonth'];
+                var t = function (key) { return key; };
+                var locale;
 
-                page.querySelectorAll('.jellywrapped-month').forEach(function (select) {
-                    for (var m = 1; m <= 12; m++) {
-                        var option = document.createElement('option');
-                        option.value = m;
-                        option.textContent = new Date(2000, m - 1, 1).toLocaleDateString(undefined, { month: 'long' });
-                        select.appendChild(option);
-                    }
-                });
+                // Loads the plugin translations and applies them to the [data-jw] elements.
+                function translate() {
+                    var ready = window.JellyWrappedI18n ? Promise.resolve() : new Promise(function (resolve, reject) {
+                        var tag = document.createElement('script');
+                        tag.src = ApiClient.getUrl('JellyWrapped/App/i18n.js');
+                        tag.onload = resolve;
+                        tag.onerror = reject;
+                        document.head.appendChild(tag);
+                    });
+                    return ready.then(function () {
+                        return window.JellyWrappedI18n.load(ApiClient.getCurrentUserId());
+                    }).then(function (i18n) {
+                        t = i18n.t;
+                        locale = i18n.locale;
+                        page.querySelectorAll('[data-jw]').forEach(function (el) { el.textContent = t(el.getAttribute('data-jw')); });
+                        page.querySelectorAll('[data-jw-html]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-jw-html')); });
+                        fillMonths();
+                    });
+                }
+
+                function fillMonths() {
+                    page.querySelectorAll('.jellywrapped-month').forEach(function (select) {
+                        var selected = select.value;
+                        select.innerHTML = '';
+                        for (var m = 1; m <= 12; m++) {
+                            var option = document.createElement('option');
+                            option.value = m;
+                            option.textContent = new Date(2000, m - 1, 1).toLocaleDateString(locale, { month: 'long' });
+                            select.appendChild(option);
+                        }
+
+                        if (selected) {
+                            select.value = selected;
+                        }
+                    });
+                }
+
+                fillMonths();
 
                 function value(id) {
                     return parseInt(page.querySelector('#' + id).value, 10) || 1;
@@ -126,24 +158,30 @@
                 function updateBannerHint() {
                     var start = value('BannerStartMonth') * 100 + value('BannerStartDay');
                     var end = value('BannerEndMonth') * 100 + value('BannerEndDay');
-                    page.querySelector('#JellyWrappedBannerHint').textContent = start > end
-                        ? 'La période chevauche le Nouvel An : après le 1er janvier, la bannière annonce le récapitulatif de l\'année écoulée.'
-                        : 'La bannière annonce le récapitulatif de l\'année en cours.';
+                    page.querySelector('#JellyWrappedBannerHint').textContent = t(start > end ? 'settings.bannerWraps' : 'settings.bannerSameYear');
                 }
 
                 numbers.forEach(function (key) { page.querySelector('#' + key).addEventListener('change', updateBannerHint); });
 
                 function loadStatus() {
                     ApiClient.getJSON(ApiClient.getUrl('JellyWrapped/Status')).then(function (status) {
-                        var years = Object.keys(status.PlaysByYear).map(function (y) {
-                            return y + ' : ' + status.PlaysByYear[y] + ' lectures';
+                        var lines = [t('settings.trackingSince', { date: new Date(status.TrackingSinceUtc).toLocaleString(locale) })];
+                        var years = Object.keys(status.PlaysByYear);
+                        years.forEach(function (y) {
+                            lines.push(t('settings.playsInYear', { year: y, plays: status.PlaysByYear[y] }));
                         });
-                        page.querySelector('#JellyWrappedStatus').innerHTML =
-                            'Enregistrement depuis le ' + new Date(status.TrackingSinceUtc).toLocaleString() + '.<br>'
-                            + (years.length ? years.join('<br>') : 'Aucune lecture enregistrée pour le moment.');
-                        page.querySelector('#JellyWrappedInjection').textContent = status.WebLinkInjected
-                            ? 'Le lien « Mon Wrapped » est ajouté au menu de Jellyfin pour tous les utilisateurs.'
-                            : 'Le plugin File Transformation n\'est pas détecté : partagez l\'adresse ci-dessus avec vos utilisateurs, ou ajoutez-la dans les « menuLinks » du fichier config.json de jellyfin-web.';
+                        if (!years.length) {
+                            lines.push(t('settings.noPlays'));
+                        }
+
+                        var box = page.querySelector('#JellyWrappedStatus');
+                        box.innerHTML = '';
+                        lines.forEach(function (line) {
+                            var row = document.createElement('div');
+                            row.textContent = line;
+                            box.appendChild(row);
+                        });
+                        page.querySelector('#JellyWrappedInjection').textContent = t(status.WebLinkInjected ? 'settings.injected' : 'settings.notInjected');
                     });
                 }
 
@@ -153,13 +191,15 @@
                     link.textContent = link.href;
 
                     Dashboard.showLoadingMsg();
-                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    translate().catch(function () { /* Keep the English defaults. */ }).then(function () {
+                        return ApiClient.getPluginConfiguration(pluginId);
+                    }).then(function (config) {
                         booleans.forEach(function (key) { page.querySelector('#' + key).checked = config[key]; });
                         numbers.forEach(function (key) { page.querySelector('#' + key).value = config[key]; });
                         updateBannerHint();
+                        loadStatus();
                         Dashboard.hideLoadingMsg();
                     });
-                    loadStatus();
                 });
 
                 page.querySelector('#JellyWrappedConfigForm').addEventListener('submit', function (e) {
@@ -179,7 +219,7 @@
                     var result = page.querySelector('#JellyWrappedImportResult');
                     var button = this;
                     button.disabled = true;
-                    result.textContent = 'Lecture de l\'historique Playback Reporting…';
+                    result.textContent = t('settings.importReading');
 
                     ApiClient.ajax({
                         type: 'POST',
@@ -205,7 +245,7 @@
 
                         return chunks.reduce(function (promise, chunk, index) {
                             return promise.then(function () {
-                                result.textContent = 'Import… ' + Math.round(index / chunks.length * 100) + ' %';
+                                result.textContent = t('settings.importProgress', { n: Math.round(index / chunks.length * 100) });
                                 return ApiClient.ajax({
                                     type: 'POST',
                                     url: ApiClient.getUrl('JellyWrapped/Import/PlaybackReporting'),
@@ -215,11 +255,11 @@
                                 }).then(function (r) { imported += r.Imported; });
                             });
                         }, Promise.resolve()).then(function () {
-                            result.textContent = imported + ' lectures importées sur ' + rows.length + ' (les lectures déjà connues, postérieures à l\'installation, ou d\'éléments supprimés sont ignorées).';
+                            result.textContent = t('settings.importDone', { imported: imported, total: rows.length });
                             loadStatus();
                         });
                     }).catch(function () {
-                        result.textContent = 'Échec : le plugin Playback Reporting est-il installé ?';
+                        result.textContent = t('settings.importFailed');
                     }).finally(function () {
                         button.disabled = false;
                     });

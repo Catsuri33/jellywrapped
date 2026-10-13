@@ -32,7 +32,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     public override Guid Id => Guid.Parse("8f868969-3282-4493-878a-3e89e2f79d3a");
 
     /// <inheritdoc />
-    public override string Description => "Un récapitulatif annuel façon « Wrapped » de vos musiques, films et séries.";
+    public override string Description => "A yearly Wrapped-style recap of your music, movies and series.";
 
     /// <summary>
     /// Gets the current plugin instance.
@@ -52,7 +52,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             new PluginPageInfo
             {
                 Name = "JellyWrappedUsers",
-                DisplayName = "Wrapped des utilisateurs",
+                DisplayName = "Users' Wrapped",
                 EmbeddedResourcePath = string.Format(CultureInfo.InvariantCulture, "{0}.Configuration.usersPage.html", GetType().Namespace),
                 EnableInMainMenu = true,
                 MenuIcon = "auto_awesome"
