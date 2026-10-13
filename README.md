@@ -18,7 +18,7 @@ A Jellyfin plugin that turns each user's listening and watching history into a y
 
 - 🎧 **Accurate tracking.** Records the time actually played, without pauses or skips. Very short plays are ignored (30 s for a track, 2 min for a video by default).
 - 📊 **Yearly recap.** Total time, music / movies / series split, top artists, tracks, albums and genres, top movies, actors and favourite decade, top series and binge record, listening habits, server ranking and a persona ("Night owl", "Binge-watcher"…).
-- 📤 **Sharing.** A 1080×1920 image generated in the browser, and an optional public link to a frozen snapshot of the recap.
+- 📤 **Sharing.** Every slide can be saved as a 1080×1920 image, plus a summary card and an optional public link to a frozen snapshot of the recap.
 - 🛠️ **Admin view.** A dashboard page showing every user's recap.
 - 🕰️ **Past history.**
   - Import from the [Playback Reporting](https://github.com/jellyfin/jellyfin-plugin-playbackreporting) plugin.

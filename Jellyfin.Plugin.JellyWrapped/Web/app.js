@@ -13,6 +13,8 @@
     const adminYear = parseInt(new URLSearchParams(location.search).get('year'), 10) || new Date().getFullYear();
     const dashboardUrl = `${base}/web/#/configurationpage?name=JellyWrappedUsers`;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DOWNLOAD_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        + '<path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>';
 
     // Set in boot() once the translations are loaded.
     let t = (key) => key;
@@ -391,7 +393,10 @@
                 <div class="story" tabindex="0">
                     <div class="bars">${slides.map(() => '<div class="bar"><i></i></div>').join('')}</div>
                     <div class="topbar"><span class="brand">JellyWrapped ${report.Year}</span>
-                        <button class="icon-btn interactive" data-action="close" aria-label="${t('app.close')}">✕</button></div>
+                        <span class="topbar-actions">
+                            <button class="icon-btn interactive" data-action="download" aria-label="${t('app.share.downloadSlide')}" title="${t('app.share.downloadSlide')}">${DOWNLOAD_ICON}</button>
+                            <button class="icon-btn interactive" data-action="close" aria-label="${t('app.close')}">✕</button>
+                        </span></div>
                     ${slides.map((s, i) => `<section class="slide ${s.theme}" data-index="${i}" hidden>${s.html}</section>`).join('')}
                     <div class="nav-zone prev" aria-hidden="true"></div>
                     <div class="nav-zone next" aria-hidden="true"></div>
@@ -516,6 +521,18 @@
                 loadYear(+target.dataset.year, ctx.years);
             } else if (target.dataset.action === 'close') {
                 close();
+            } else if (target.dataset.action === 'download') {
+                setPaused(true);
+                target.disabled = true;
+                try {
+                    const blob = await renderSlide(sections[index], story, report.Year);
+                    await saveImage(blob, `jellywrapped-${report.Year}-${String(index + 1).padStart(2, '0')}.png`, report.Year);
+                } catch {
+                    toast(t('app.share.imageError'));
+                } finally {
+                    target.disabled = false;
+                    setPaused(false);
+                }
             } else if (target.dataset.action === 'image') {
                 setPaused(true);
                 await shareImage(report, target);
@@ -690,33 +707,128 @@
         return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     }
 
+    // Opens the share sheet where available (phones), else downloads the file.
+    async function saveImage(blob, fileName, year) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], title: t('app.share.title', { year: String(year) }) });
+                return;
+            } catch (e) {
+                if (e.name === 'AbortError') {
+                    return;
+                }
+            }
+        }
+
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = file.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+        toast(t('app.share.imageSaved'));
+    }
+
     async function shareImage(report, button) {
         button.disabled = true;
         try {
-            const blob = await renderImage(report);
-            const file = new File([blob], `jellywrapped-${report.Year}.png`, { type: 'image/png' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({ files: [file], title: t('app.share.title', { year: String(report.Year) }) });
-                    return;
-                } catch (e) {
-                    if (e.name === 'AbortError') {
-                        return;
-                    }
-                }
-            }
-
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = file.name;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-            toast(t('app.share.imageSaved'));
+            await saveImage(await renderImage(report), `jellywrapped-${report.Year}.png`, report.Year);
         } catch {
             toast(t('app.share.imageError'));
         } finally {
             button.disabled = false;
         }
+    }
+
+    // ---------- Slide export ----------
+
+    let stylesheet = null;
+
+    async function getStylesheet() {
+        if (stylesheet === null) {
+            try {
+                stylesheet = await (await fetch('app.css')).text();
+            } catch {
+                stylesheet = '';
+            }
+        }
+
+        return stylesheet;
+    }
+
+    function toDataUrl(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    // An SVG image cannot load anything: images must be embedded.
+    async function embedImages(root) {
+        await Promise.all([...root.querySelectorAll('img')].map(async (el) => {
+            try {
+                const response = await fetch(el.src);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                el.src = await toDataUrl(await response.blob());
+            } catch {
+                const placeholder = document.createElement('div');
+                placeholder.className = el.className;
+                placeholder.textContent = el.dataset.initial || '';
+                el.replaceWith(placeholder);
+            }
+        }));
+    }
+
+    // Renders a slide, as displayed but without the controls, to a 1080-pixel-wide PNG:
+    // the slide is copied into an SVG <foreignObject> together with the stylesheet, then drawn on a canvas.
+    async function renderSlide(section, story, year) {
+        const width = story.clientWidth;
+        const height = story.clientHeight;
+        const clone = section.cloneNode(true);
+
+        // Viewport units mean something else inside an SVG image: freeze the font sizes as displayed.
+        const originals = [section, ...section.querySelectorAll('*')];
+        const copies = [clone, ...clone.querySelectorAll('*')];
+        originals.forEach((el, i) => {
+            copies[i].style.fontSize = getComputedStyle(el).fontSize;
+        });
+
+        clone.hidden = false;
+        clone.classList.add('active');
+        clone.querySelectorAll('[data-count]').forEach((el) => {
+            el.textContent = fmt(+el.dataset.count);
+        });
+        clone.querySelectorAll('.interactive').forEach((el) => el.remove());
+        await embedImages(clone);
+
+        const css = (await getStylesheet()).replace(/\]\]>/g, '');
+        const font = getComputedStyle(document.body).fontFamily.replace(/"/g, '\'');
+        const html = `<div xmlns="http://www.w3.org/1999/xhtml" class="slide-export" style="position:relative;width:${width}px;height:${height}px;overflow:hidden;color:#fff;font-family:${font}">`
+            + `<style><![CDATA[${css}
+                .slide-export *, .slide-export *::before, .slide-export *::after { animation: none !important; transition: none !important; }
+                .slide-export .watermark { position: absolute; z-index: 5; left: 0; right: 0; bottom: 12px; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: .14em; opacity: .65; }
+            ]]></style>`
+            + new XMLSerializer().serializeToString(clone)
+            + `<div class="watermark">JELLYWRAPPED ${year}</div></div>`;
+
+        const scale = 1080 / width;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.round(width * scale)}" height="${Math.round(height * scale)}" viewBox="0 0 ${width} ${height}">`
+            + `<foreignObject x="0" y="0" width="${width}" height="${height}">${html}</foreignObject></svg>`;
+
+        const image = new Image();
+        image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        await image.decode();
+
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(width * scale);
+        canvas.height = Math.round(height * scale);
+        canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+        return new Promise((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Empty image'))), 'image/png'));
     }
 
     // ---------- Boot ----------

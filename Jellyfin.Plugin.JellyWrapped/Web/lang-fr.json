@@ -143,6 +143,7 @@
       "linkError": "Impossible de créer le lien",
       "imageSaved": "Image enregistrée",
       "imageError": "Impossible de générer l'image",
+      "downloadSlide": "Enregistrer cette slide en image",
       "title": "Mon JellyWrapped {year}"
     }
   },
