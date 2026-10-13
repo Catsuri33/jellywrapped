@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Wrapped des utilisateurs</title>
+</head>
+<body>
+    <div id="JellyWrappedUsersPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-select">
+        <style>
+            #JellyWrappedUsersPage .jw-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1em; margin-bottom: 1.5em; }
+            #JellyWrappedUsersPage .jw-head h2 { margin: 0; }
+            #JellyWrappedUsersPage .jw-tools { display: flex; align-items: flex-end; gap: 1em; }
+            #JellyWrappedUsersPage .jw-tools .selectContainer { margin: 0; min-width: 8em; }
+            #JellyWrappedUsersPage .jw-summary { display: flex; flex-wrap: wrap; gap: 2.5em; margin-bottom: 1.5em; opacity: .9; }
+            #JellyWrappedUsersPage .jw-summary b { display: block; font-size: 1.8em; }
+            #JellyWrappedUsersPage .jw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1em; }
+            #JellyWrappedUsersPage .jw-card { border-radius: 12px; padding: 1.1em 1.2em; background: linear-gradient(150deg, rgba(170, 92, 195, .28), rgba(0, 164, 220, .18)); display: flex; flex-direction: column; gap: .6em; }
+            #JellyWrappedUsersPage .jw-card.empty { background: rgba(127, 127, 127, .12); opacity: .7; }
+            #JellyWrappedUsersPage .jw-name { font-weight: 700; font-size: 1.15em; display: flex; justify-content: space-between; gap: .5em; }
+            #JellyWrappedUsersPage .jw-persona { font-weight: 400; font-size: .85em; opacity: .85; white-space: nowrap; }
+            #JellyWrappedUsersPage .jw-minutes { font-size: 2em; font-weight: 800; line-height: 1; }
+            #JellyWrappedUsersPage .jw-minutes small { font-size: .45em; font-weight: 400; opacity: .8; }
+            #JellyWrappedUsersPage .jw-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(127, 127, 127, .25); }
+            #JellyWrappedUsersPage .jw-legend { display: flex; gap: 1em; font-size: .8em; opacity: .85; }
+            #JellyWrappedUsersPage .jw-legend i { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .3em; }
+            #JellyWrappedUsersPage .jw-tops { font-size: .9em; line-height: 1.6; }
+            #JellyWrappedUsersPage .jw-tops div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            #JellyWrappedUsersPage .jw-tops span { opacity: .7; }
+            #JellyWrappedUsersPage .jw-card .emby-button { margin: .4em 0 0; }
+        </style>
+        <div data-role="content">
+            <div class="content-primary">
+                <div class="jw-head">
+                    <div>
+                        <h2>Wrapped des utilisateurs</h2>
+                        <a id="JellyWrappedSettingsLink" is="emby-linkbutton" class="button-link" href="#">Réglages de JellyWrapped</a>
+                    </div>
+                    <div class="jw-tools">
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="JellyWrappedYear">Année</label>
+                            <select is="emby-select" id="JellyWrappedYear" class="emby-select-withcolor emby-select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="JellyWrappedSummary" class="jw-summary"></div>
+                <div id="JellyWrappedGrid" class="jw-grid"></div>
+                <p class="fieldDescription">« Voir le Wrapped » ouvre le récapitulatif complet de l'utilisateur dans un nouvel onglet, tel qu'il le voit.</p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            (function () {
+                var page = document.querySelector('#JellyWrappedUsersPage');
+                var yearSelect = page.querySelector('#JellyWrappedYear');
+                var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+                var nf = new Intl.NumberFormat();
+                var personas = {
+                    'binge-watcher': '🍿 Binge-watcher', 'night-owl': '🦉 Oiseau de nuit', 'early-bird': '🌅 Lève-tôt',
+                    'explorer': '🧭 Explorateur musical', 'music-lover': '🎧 Mélomane', 'cinephile': '🎬 Cinéphile',
+                    'series-addict': '📺 Sériephile', 'weekend-warrior': '🛋️ Pro du week-end', 'eclectic': '🌈 Éclectique'
+                };
+                var colors = { MusicMinutes: '#f72585', MovieMinutes: '#fb8500', SeriesMinutes: '#00bbf9' };
+                var labels = { MusicMinutes: 'Musique', MovieMinutes: 'Films', SeriesMinutes: 'Séries' };
+
+                function el(tag, className, text) {
+                    var node = document.createElement(tag);
+                    if (className) {
+                        node.className = className;
+                    }
+
+                    if (text !== undefined) {
+                        node.textContent = text;
+                    }
+
+                    return node;
+                }
+
+                function top(label, value) {
+                    var row = el('div');
+                    row.appendChild(el('span', '', label + ' : '));
+                    row.appendChild(document.createTextNode(value));
+                    row.title = value;
+                    return row;
+                }
+
+                function card(user, year) {
+                    var c = el('div', 'jw-card' + (user.HasData ? '' : ' empty'));
+                    var name = el('div', 'jw-name');
+                    name.appendChild(el('span', '', user.UserName));
+                    if (user.HasData) {
+                        name.appendChild(el('span', 'jw-persona', personas[user.Persona] || ''));
+                    }
+
+                    c.appendChild(name);
+                    if (!user.HasData) {
+                        c.appendChild(el('div', '', 'Aucune lecture en ' + year + '.'));
+                        return c;
+                    }
+
+                    var t = user.Totals;
+                    var minutes = el('div', 'jw-minutes', nf.format(t.Minutes) + ' ');
+                    minutes.appendChild(el('small', '', 'minutes · ' + nf.format(t.Plays) + ' lectures'));
+                    c.appendChild(minutes);
+
+                    var bar = el('div', 'jw-bar');
+                    var legend = el('div', 'jw-legend');
+                    Object.keys(colors).forEach(function (key) {
+                        if (t[key] > 0) {
+                            var part = el('div');
+                            part.style.width = (t[key] / Math.max(1, t.Minutes) * 100) + '%';
+                            part.style.background = colors[key];
+                            bar.appendChild(part);
+                            var item = el('span');
+                            var dot = el('i');
+                            dot.style.background = colors[key];
+                            item.appendChild(dot);
+                            item.appendChild(document.createTextNode(labels[key] + ' ' + Math.round(t[key] / Math.max(1, t.Minutes) * 100) + ' %'));
+                            legend.appendChild(item);
+                        }
+                    });
+                    c.appendChild(bar);
+                    c.appendChild(legend);
+
+                    var tops = el('div', 'jw-tops');
+                    if (user.TopArtist) {
+                        tops.appendChild(top('Artiste', user.TopArtist));
+                    }
+
+                    if (user.TopTrack) {
+                        tops.appendChild(top('Titre', user.TopTrack));
+                    }
+
+                    if (user.TopMovie) {
+                        tops.appendChild(top('Film', user.TopMovie));
+                    }
+
+                    if (user.TopSeries) {
+                        tops.appendChild(top('Série', user.TopSeries));
+                    }
+
+                    c.appendChild(tops);
+
+                    var info = [];
+                    if (user.ContainsEstimates) {
+                        info.push('contient des estimations');
+                    }
+
+                    if (user.Shared) {
+                        info.push('partagé publiquement');
+                    }
+
+                    if (info.length) {
+                        c.appendChild(el('div', 'fieldDescription', info.join(' · ')));
+                    }
+
+                    var link = el('a', 'raised emby-button', 'Voir le Wrapped');
+                    link.href = ApiClient.getUrl('JellyWrapped/App/') + '?user=' + encodeURIComponent(user.UserId) + '&year=' + year;
+                    link.target = '_blank';
+                    link.rel = 'noopener';
+                    c.appendChild(link);
+                    return c;
+                }
+
+                function load(year) {
+                    Dashboard.showLoadingMsg();
+                    var params = { tz: tz };
+                    if (year) {
+                        params.year = year;
+                    }
+
+                    ApiClient.getJSON(ApiClient.getUrl('JellyWrapped/Admin/Users', params)).then(function (data) {
+                        yearSelect.innerHTML = '';
+                        data.Years.forEach(function (y) {
+                            var option = el('option', '', String(y));
+                            option.value = y;
+                            yearSelect.appendChild(option);
+                        });
+                        yearSelect.value = data.Year;
+
+                        var active = data.Users.filter(function (u) { return u.HasData; });
+                        var total = active.reduce(function (sum, u) { return sum + u.Totals.Minutes; }, 0);
+                        var summary = page.querySelector('#JellyWrappedSummary');
+                        summary.innerHTML = '';
+                        [[nf.format(total), 'minutes sur le serveur'], [active.length + ' / ' + data.Users.length, 'utilisateurs actifs']].forEach(function (s) {
+                            var block = el('div');
+                            block.appendChild(el('b', '', s[0]));
+                            block.appendChild(document.createTextNode(s[1]));
+                            summary.appendChild(block);
+                        });
+
+                        var grid = page.querySelector('#JellyWrappedGrid');
+                        grid.innerHTML = '';
+                        data.Users
+                            .slice()
+                            .sort(function (a, b) { return (b.HasData ? b.Totals.Minutes : -1) - (a.HasData ? a.Totals.Minutes : -1); })
+                            .forEach(function (user) { grid.appendChild(card(user, data.Year)); });
+                        Dashboard.hideLoadingMsg();
+                    }).catch(function () {
+                        Dashboard.hideLoadingMsg();
+                        page.querySelector('#JellyWrappedGrid').textContent = 'Impossible de charger les récapitulatifs.';
+                    });
+                }
+
+                yearSelect.addEventListener('change', function () { load(yearSelect.value); });
+
+                page.addEventListener('pageshow', function () {
+                    page.querySelector('#JellyWrappedSettingsLink').href = '#/configurationpage?name=JellyWrapped';
+                    load(yearSelect.value || null);
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

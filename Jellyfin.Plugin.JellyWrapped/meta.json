@@ -1,0 +1,16 @@
+{
+  "category": "General",
+  "changelog": "Première version.",
+  "description": "JellyWrapped enregistre les lectures de chaque utilisateur et génère, pour chaque année, un récapitulatif en « stories » : temps passé, artistes, titres, albums, films, séries, habitudes d'écoute et profil. Chaque utilisateur peut le partager en image ou via un lien public.",
+  "guid": "8f868969-3282-4493-878a-3e89e2f79d3a",
+  "name": "JellyWrapped",
+  "overview": "Un récapitulatif annuel façon « Wrapped » de vos musiques, films et séries",
+  "owner": "Louis Michault",
+  "targetAbi": "12.2.0.0",
+  "timestamp": "2026-10-13T00:00:00Z",
+  "version": "1.0.0.0",
+  "status": "Active",
+  "autoUpdate": false,
+  "imagePath": "jellywrapped.png",
+  "assemblies": []
+}

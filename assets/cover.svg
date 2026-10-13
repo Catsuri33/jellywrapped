@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a0b4a"/>
+      <stop offset=".55" stop-color="#120a2b"/>
+      <stop offset="1" stop-color="#00334d"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#000" flood-opacity=".5"/></filter>
+    <radialGradient id="g1"><stop offset="0" stop-color="#aa5cc3" stop-opacity=".6"/><stop offset="1" stop-color="#aa5cc3" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g2"><stop offset="0" stop-color="#00a4dc" stop-opacity=".5"/><stop offset="1" stop-color="#00a4dc" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g3"><stop offset="0" stop-color="#f72585" stop-opacity=".35"/><stop offset="1" stop-color="#f72585" stop-opacity="0"/></radialGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffe9a8"/>
+    </linearGradient>
+    <linearGradient id="c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a0ca3"/><stop offset="1" stop-color="#f72585"/></linearGradient>
+    <linearGradient id="c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#003b4d"/><stop offset="1" stop-color="#00b4a0"/></linearGradient>
+    <linearGradient id="c3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6f0000"/><stop offset="1" stop-color="#f09819"/></linearGradient>
+    <clipPath id="card"><rect width="230" height="408" rx="22"/></clipPath>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <circle cx="180" cy="110" r="520" fill="url(#g1)"/>
+  <circle cx="1180" cy="700" r="560" fill="url(#g2)"/>
+  <circle cx="930" cy="80" r="380" fill="url(#g3)"/>
+
+  <!-- Text -->
+  <g font-family="Inter, DejaVu Sans, sans-serif">
+    <text x="88" y="262" font-size="26" font-weight="800" letter-spacing="5" fill="#ffd84d">TON ANNÉE SUR JELLYFIN</text>
+    <text x="80" y="370" font-size="98" font-weight="900" letter-spacing="-3" fill="url(#title)">JellyWrapped</text>
+    <text x="88" y="432" font-size="34" font-weight="500" fill="#ffffff" opacity=".78">Musique · Films · Séries</text>
+    <g font-size="22" font-weight="700">
+      <rect x="88" y="476" width="168" height="46" rx="23" fill="#ffffff"/>
+      <text x="172" y="506" text-anchor="middle" fill="#111">Top artistes</text>
+      <rect x="270" y="476" width="146" height="46" rx="23" fill="#ffffff" fill-opacity=".16"/>
+      <text x="343" y="506" text-anchor="middle" fill="#fff">Top films</text>
+      <rect x="430" y="476" width="178" height="46" rx="23" fill="#ffffff" fill-opacity=".16"/>
+      <text x="519" y="506" text-anchor="middle" fill="#fff">Record binge</text>
+    </g>
+  </g>
+
+  <!-- Story cards -->
+  <g font-family="Inter, DejaVu Sans, sans-serif" filter="url(#shadow)">
+    <!-- Back left: habits chart -->
+    <g transform="translate(800 190) rotate(-12)">
+      <g clip-path="url(#card)">
+        <rect width="230" height="408" fill="url(#c2)"/>
+        <g fill="#fff" opacity=".4"><rect x="14" y="14" width="44" height="4" rx="2"/><rect x="62" y="14" width="44" height="4" rx="2"/><rect x="110" y="14" width="44" height="4" rx="2" opacity=".5"/><rect x="158" y="14" width="58" height="4" rx="2" opacity=".5"/></g>
+        <text x="20" y="80" font-size="13" font-weight="800" letter-spacing="2" fill="#ffd84d">TES HABITUDES</text>
+        <text x="20" y="116" font-size="26" font-weight="900" fill="#fff">Mars</text>
+        <g fill="#fff" fill-opacity=".45">
+          <rect x="20" y="300" width="12" height="40" rx="3"/><rect x="36" y="280" width="12" height="60" rx="3"/>
+          <rect x="52" y="230" width="12" height="110" rx="3" fill="#ffd84d" fill-opacity="1"/><rect x="68" y="270" width="12" height="70" rx="3"/>
+          <rect x="84" y="290" width="12" height="50" rx="3"/><rect x="100" y="260" width="12" height="80" rx="3"/>
+          <rect x="116" y="300" width="12" height="40" rx="3"/><rect x="132" y="285" width="12" height="55" rx="3"/>
+          <rect x="148" y="250" width="12" height="90" rx="3"/><rect x="164" y="275" width="12" height="65" rx="3"/>
+          <rect x="180" y="295" width="12" height="45" rx="3"/><rect x="196" y="265" width="12" height="75" rx="3"/>
+        </g>
+      </g>
+    </g>
+    <!-- Back right: movies -->
+    <g transform="translate(1025 150) rotate(10)">
+      <g clip-path="url(#card)">
+        <rect width="230" height="408" fill="url(#c3)"/>
+        <g fill="#fff" opacity=".4"><rect x="14" y="14" width="44" height="4" rx="2"/><rect x="62" y="14" width="44" height="4" rx="2"/><rect x="110" y="14" width="44" height="4" rx="2"/><rect x="158" y="14" width="58" height="4" rx="2" opacity=".5"/></g>
+        <text x="20" y="80" font-size="13" font-weight="800" letter-spacing="2" fill="#ffd84d">CÔTÉ CINÉMA</text>
+        <text x="20" y="116" font-size="26" font-weight="900" fill="#fff">42 films</text>
+        <rect x="20" y="150" width="88" height="132" rx="8" fill="#fff" fill-opacity=".22"/>
+        <rect x="118" y="150" width="88" height="132" rx="8" fill="#fff" fill-opacity=".14"/>
+        <rect x="20" y="300" width="96" height="26" rx="13" fill="#fff"/>
+        <rect x="124" y="300" width="70" height="26" rx="13" fill="#fff" fill-opacity=".2"/>
+      </g>
+    </g>
+    <!-- Front: top artist -->
+    <g transform="translate(895 230) rotate(-2)">
+      <g clip-path="url(#card)">
+        <rect width="230" height="408" fill="url(#c1)"/>
+        <g fill="#fff" opacity=".45"><rect x="14" y="14" width="44" height="4" rx="2" opacity="1"/><rect x="62" y="14" width="44" height="4" rx="2"/><rect x="110" y="14" width="44" height="4" rx="2"/><rect x="158" y="14" width="58" height="4" rx="2"/></g>
+        <text x="20" y="72" font-size="13" font-weight="800" letter-spacing="2" fill="#ffd84d">TON ARTISTE N°1</text>
+        <circle cx="115" cy="170" r="72" fill="#fff" fill-opacity=".22"/>
+        <circle cx="115" cy="150" r="26" fill="#fff" fill-opacity=".55"/>
+        <path d="M71 214 a44 38 0 0 1 88 0 z" fill="#fff" fill-opacity=".55"/>
+        <text x="115" y="284" text-anchor="middle" font-size="40" font-weight="900" fill="#fff">1 981</text>
+        <text x="115" y="308" text-anchor="middle" font-size="15" font-weight="600" fill="#fff" opacity=".8">minutes d'écoute</text>
+        <g fill="#fff"><rect x="20" y="340" width="190" height="8" rx="4" fill-opacity=".2"/><rect x="20" y="340" width="150" height="8" rx="4"/>
+        <rect x="20" y="360" width="190" height="8" rx="4" fill-opacity=".2"/><rect x="20" y="360" width="104" height="8" rx="4" fill-opacity=".7"/></g>
+      </g>
+    </g>
+  </g>
+</svg>
